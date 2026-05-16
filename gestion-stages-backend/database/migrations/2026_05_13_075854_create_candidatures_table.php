@@ -14,11 +14,11 @@ return new class extends Migration
         Schema::create('candidatures', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users');
-             $table->foreignId('offre_stage_id')->constrained('offre_stages') ;
-            
-            $table->string('cv_path');
+            $table->foreignId('offre_stage_id')->constrained('offre_stages') ;
+            $table->foreignId('cv_id')->nullable()->constrained()->nullOnDelete(); 
             $table->text('lettre_motivation')->nullable(); 
-            $table->enum('statut', ['en_attente', 'acceptee', 'refusee'])->default('en_attente');
+            $table->enum('statut', ['en_attente', 'accepte', 'refuse', 'annule'])->default('en_attente');   
+             $table->string('cv_file_snapshot');
             $table->timestamps();
         });
     }
