@@ -31,6 +31,7 @@ class UserFactory extends Factory
             'password' => static::$password ??= Hash::make('password'),
             'telephone' => fake()->phoneNumber(),
             'adresse' => fake()->address(),
+            'role' => 'etudiant',
             'remember_token' => Str::random(10),
         ];
     }
@@ -49,17 +50,12 @@ public function etudiant(): static
             'role' => 'entreprise',
             'nom' => fake()->company(),  
             'description' => fake()->realText(200),
-            'est_valide' => fake()->boolean(80),  
+            'est_valide' => true,  
             'site_web' => fake()->url(),
         ]);
     }
 
-    public function admin(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'role' => 'admin',
-        ]);
-    }
+ 
     /**
      * Indicate that the model's email address should be unverified.
      */
