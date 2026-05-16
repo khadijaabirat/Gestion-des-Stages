@@ -29,6 +29,7 @@ return new class extends Migration
             $table->boolean('est_valide')->default(false);  
             $table->string('site_web')->nullable();
 
+            $table->boolean('is_blocked')->default(false); 
             $table->rememberToken();
             $table->timestamps();
         });
