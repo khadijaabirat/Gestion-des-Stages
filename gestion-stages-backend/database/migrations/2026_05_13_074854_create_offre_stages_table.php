@@ -17,9 +17,10 @@ return new class extends Migration
             $table->string('titre');
             $table->text('description');
             $table->date('date_debut');
+            $table->date('date_expiration');
             $table->integer('duree'); 
-            $table->enum('statut', ['ouverte', 'fermee'])->default('ouverte');
             $table->string('localisation');
+            $table->enum('statut', ['draft', 'published', 'closed', 'expired'])->default('draft');   
             $table->timestamps();
         });
     }
