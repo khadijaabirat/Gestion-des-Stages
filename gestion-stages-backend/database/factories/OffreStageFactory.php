@@ -19,13 +19,14 @@ class OffreStageFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => User::factory()->entreprise(), 
+            'user_id' => User::factory(), 
             'titre' => 'Stage en ' . fake()->jobTitle(),
-            'description' => fake()->realText(300),
+            'description' => fake()->realText(300),   
             'date_debut' => fake()->dateTimeBetween('now', '+2 months')->format('Y-m-d'),
+            'date_expiration' => fake()->dateTimeBetween('+2 months', '+3 months'),
             'duree' => fake()->numberBetween(1, 6), 
-            'statut' => fake()->randomElement(['ouverte', 'fermee']),
             'localisation' => fake()->city(),
+'statut' => fake()->randomElement(['draft', 'published', 'published', 'closed']),           
         ];
     }
 }
