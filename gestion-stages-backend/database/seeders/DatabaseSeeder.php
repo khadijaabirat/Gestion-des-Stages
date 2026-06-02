@@ -4,7 +4,9 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use App\Models\OffreStage;
-use App\Models\Candidature;
+use App\Models\Cv;
+use App\Models\Experience;
+use App\Models\Skill;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -17,21 +19,41 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-       User::factory()->admin()->create([
-            'nom' => 'Admin Principal',
-            'email' => 'admin@gmail.com',
-            'password' => bcrypt('password'), 
+        $this->call([
+            AdminSeeder::class,
+            SkillsSeeder::class,
         ]);
-        User::factory(5)->entreprise()->hasOffresStages(3)->create();
-        $etudiants = User::factory(10)->etudiant()->create();
-        $offres = OffreStage::all();
-        foreach ($etudiants as $etudiant) {
-            Candidature::factory(2)->create([
-                'user_id' => $etudiant->id,
-                'offre_stage_id' => $offres->random()->id,
+
+        $entreprises = User::factory()->count(5)->entreprise()->create();
+
+        $entreprises->each(function ($entreprise) {
+            OffreStage::factory()->count(3)->create([
+                'user_id' => $entreprise->id,
+                'statut' => 'published',
             ]);
-        }
+        });
+
+        $skills = Skill::all();
+
+        User::factory()->count(10)->etudiant()->create()->each(function ($etudiant) use ($skills) {
+            $etudiant->skills()->attach(
+                $skills->random(rand(3, 6))->pluck('id')->toArray()
+            );
+
+            Cv::create([
+                'user_id' => $etudiant->id,
+                'title' => 'CV_' . $etudiant->nom,
+                'file_path' => 'cvs/dummy.pdf',
+                'is_main' => true,
+            ]);
+
+            Experience::create([
+                'user_id' => $etudiant->id,
+                'titre' => 'Stage d\'observation',
+                'entreprise' => 'Tech Company Maroc',
+                'date_debut' => now()->subMonths(6),
+                'date_fin' => now()->subMonths(4),
+            ]);
+        });
     }
 }
