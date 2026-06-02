@@ -8,6 +8,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\OffreStage;
+use App\Models\Candidature;
+use App\Models\Skill;
+use App\Models\Cv;
+use App\Models\Experience;
+ use App\Models\Conversation;
+use App\Models\Message;
+
+
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
@@ -31,6 +40,7 @@ class User extends Authenticatable
          'description',
         'est_valide',
         'site_web',
+        'is_blocked',
     ];
 
     /**
@@ -61,18 +71,38 @@ class User extends Authenticatable
         return $this->hasMany(OffreStage::class, 'user_id');
     }
 
-     public function candidatures()
+    public function candidatures()
     {
         return $this->hasMany(Candidature::class, 'user_id');
-    }
+        }
 
-     public function isEtudiant() { 
-        return $this->role === 'etudiant'; 
-        }
-    public function isEntreprise() { 
-        return $this->role === 'entreprise'; 
-        }
-    public function isAdmin() { 
-        return $this->role === 'admin';
-         }
+        public function skills()
+    {
+        return $this->belongsToMany(Skill::class);
+    }
+    
+    public function cvs()
+    {
+        return $this->hasMany(Cv::class);
+    }
+    
+    public function experiences()
+    {
+        return $this->hasMany(Experience::class);
+    }
+ 
+
+    public function conversations()
+    {
+         return $this->belongsToMany(Conversation::class)
+                    ->withPivot('role', 'last_read_at'); 
+    }
+    
+    public function messages()
+    {
+        return $this->hasMany(Message::class);
+    }
+  
+
+ 
 }
