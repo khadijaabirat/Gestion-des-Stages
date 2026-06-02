@@ -20,6 +20,7 @@ return new class extends Migration
             $table->enum('statut', ['en_attente', 'accepte', 'refuse', 'annule'])->default('en_attente');   
              $table->string('cv_file_snapshot');
             $table->timestamps();
+            $table->unique(['user_id', 'offre_stage_id']);
         });
     }
 
