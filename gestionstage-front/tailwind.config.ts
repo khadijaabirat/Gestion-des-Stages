@@ -1,0 +1,73 @@
+import type { Config } from 'tailwindcss';
+
+const config: Config = {
+  content: [
+    './pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './components/**/*.{js,ts,jsx,tsx,mdx}',
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  theme: {
+    extend: {
+      colors: {
+        primary: '#ff7e5f',
+        'primary-container': '#ffb4a3',
+        'on-primary': '#ffffff',
+        'on-primary-container': '#721702',
+        secondary: '#5644d0',
+        'secondary-container': '#6f5fea',
+        'on-secondary': '#ffffff',
+        'on-secondary-container': '#fffbff',
+        tertiary: '#7f5600',
+        'tertiary-container': '#da9700',
+        'on-tertiary': '#ffffff',
+        'on-tertiary-container': '#503500',
+        background: '#faf8ff',
+        'on-background': '#131b2e',
+        surface: '#faf8ff',
+        'surface-variant': '#dae2fd',
+        'surface-container-lowest': '#ffffff',
+        'surface-container-low': '#f2f3ff',
+        'surface-container': '#eaedff',
+        'surface-container-high': '#e2e7ff',
+        'surface-container-highest': '#dae2fd',
+        'on-surface': '#131b2e',
+        'on-surface-variant': '#57423d',
+        outline: '#8b716b',
+        'outline-variant': '#dec0b9',
+        error: '#ba1a1a',
+        'error-container': '#ffdad6',
+        'on-error': '#ffffff',
+        'on-error-container': '#93000a',
+      },
+      fontFamily: {
+        sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+        heading: ['var(--font-jakarta)', 'system-ui', 'sans-serif'],
+        mono: ['var(--font-jetbrains)', 'monospace'],
+      },
+      fontSize: {
+        'display-lg': ['48px', { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '800' }],
+        'display-lg-mobile': ['32px', { lineHeight: '1.2', fontWeight: '800' }],
+        'headline-md': ['24px', { lineHeight: '1.3', fontWeight: '700' }],
+        'body-base': ['16px', { lineHeight: '1.6', fontWeight: '400' }],
+        'body-sm': ['14px', { lineHeight: '1.5', fontWeight: '400' }],
+        'label-caps': ['12px', { lineHeight: '1', letterSpacing: '0.05em', fontWeight: '600' }],
+      },
+      animation: {
+        'float': 'float 4s ease-in-out infinite',
+        'marquee': 'marquee 30s linear infinite',
+        'slide-in-left': 'slideInLeft 0.6s ease-out',
+        'slide-in-right': 'slideInRight 0.6s ease-out',
+        'scale-in': 'scaleIn 0.5s ease-out',
+        'fade-in-scale': 'fadeInScale 0.6s ease-out',
+        'glow': 'glow 2s infinite',
+        'shimmer': 'shimmer 2s infinite',
+        'bounce-soft': 'bounce-soft 1.5s ease-in-out infinite',
+        'flip': 'flip 1s ease-in-out',
+        'pulse-ring': 'pulse-ring 2s infinite',
+      },
+    },
+  },
+  plugins: [],
+};
+
+export default config;
