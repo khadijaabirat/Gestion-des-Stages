@@ -5,21 +5,39 @@ import Partners from '@/components/home/Partners';
 import FeaturedOpportunities from '@/components/home/FeaturedOpportunities';
 import AIMatching from '@/components/home/AIMatching';
 import GlobalEcosystem from '@/components/home/GlobalEcosystem';
-import EliteMentors from '@/components/home/EliteMentors';
 import AIMentorship from '@/components/home/AIMentorship';
+import WordSphere from '@/components/home/WordSphere';
+import CTA from '@/components/home/CTA';
 
-export default function HomePage() {
+async function getHomeData() {
+  try {
+    const res = await fetch('http://localhost:8000/api/home/data', {
+      next: { revalidate: 60 }, // Revalidate every 60 seconds
+      headers: { 'Accept': 'application/json' },
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (error) {
+    console.error('Error fetching home data:', error);
+    return null;
+  }
+}
+
+export default async function HomePage() {
+  const data = await getHomeData();
+
   return (
     <main className="flex-grow pt-28 pb-0 relative z-10">
       <Hero />
-      <Stats />
+      <Stats stats={data?.stats} />
       <ProcessRoadmap />
-      <Partners />
-      <FeaturedOpportunities />
+      <Partners partners={data?.partners} />
+      <FeaturedOpportunities offres={data?.recent_offres} />
       <AIMatching />
       <GlobalEcosystem />
-      <EliteMentors />
+      <WordSphere />
       <AIMentorship />
+      <CTA />
     </main>
   );
 }
