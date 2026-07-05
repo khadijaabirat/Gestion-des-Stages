@@ -43,7 +43,7 @@ export default function AIMentorship() {
         <div className="absolute -right-20 -bottom-20 w-96 h-96 bg-secondary/10 rounded-full blur-3xl pointer-events-none" />
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
-          <div className="relative min-h-[400px] rounded-2xl glass-panel border border-white/50 shadow-xl flex items-center justify-center p-8">
+          <div className="relative min-h-[400px] rounded-2xl glass-panel border border-white/80 shadow-xl flex items-center justify-center p-8">
             <div className="absolute inset-0 bg-gradient-to-br from-secondary/20 to-transparent opacity-50 rounded-2xl" />
             <div className="relative z-10 flex flex-col gap-6 w-full">
               {features.map((feature, i) => (
