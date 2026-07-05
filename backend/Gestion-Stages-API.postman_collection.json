@@ -1,0 +1,197 @@
+{
+  "info": {
+    "name": "API Gestion de Stages",
+    "description": "Collection complète pour tester l'API de gestion de stages",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000/api"
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register Etudiant",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Étudiant Test\",\n  \"email\": \"etudiant@test.com\",\n  \"password\": \"password123\",\n  \"password_confirmation\": \"password123\",\n  \"role\": \"etudiant\",\n  \"filiere\": \"Informatique\",\n  \"niveau_etude\": \"Licence\",\n  \"telephone\": \"0612345678\"\n}"
+            },
+            "url": {"raw": "{{base_url}}/register"}
+          }
+        },
+        {
+          "name": "Register Entreprise",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Entreprise Test\",\n  \"email\": \"entreprise@test.com\",\n  \"password\": \"password123\",\n  \"password_confirmation\": \"password123\",\n  \"role\": \"entreprise\",\n  \"description\": \"Description de l'entreprise\",\n  \"telephone\": \"0612345678\",\n  \"site_web\": \"https://example.com\"\n}"
+            },
+            "url": {"raw": "{{base_url}}/register"}
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@stageconnect.ma\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {"raw": "{{base_url}}/login"}
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{base_url}}/logout"}
+          }
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{base_url}}/user"}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Offres",
+      "item": [
+        {
+          "name": "Liste Offres (Public)",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{base_url}}/offres"}
+          }
+        },
+        {
+          "name": "Détails Offre",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{base_url}}/offres/1"}
+          }
+        },
+        {
+          "name": "Créer Offre (Entreprise)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titre\": \"Stage Développeur Web\",\n  \"description\": \"Nous recherchons un stagiaire développeur web...\",\n  \"localisation\": \"Casablanca\",\n  \"duree\": \"3 mois\",\n  \"statut\": \"published\"\n}"
+            },
+            "url": {"raw": "{{base_url}}/entreprise/offres"}
+          }
+        },
+        {
+          "name": "Mes Offres (Entreprise)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{base_url}}/entreprise/mes-offres"}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Candidatures",
+      "item": [
+        {
+          "name": "Postuler (Étudiant)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"offre_stage_id\": 1,\n  \"cv_id\": 1,\n  \"lettre_motivation\": \"Je suis très intéressé...\"\n}"
+            },
+            "url": {"raw": "{{base_url}}/candidatures"}
+          }
+        },
+        {
+          "name": "Mes Candidatures",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{base_url}}/candidatures"}
+          }
+        },
+        {
+          "name": "Accepter Candidature (Entreprise)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"statut\": \"accepte\"\n}"
+            },
+            "url": {"raw": "{{base_url}}/candidatures/1"}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Liste Utilisateurs",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{base_url}}/admin/users"}
+          }
+        },
+        {
+          "name": "Valider Entreprise",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"approuver\"\n}"
+            },
+            "url": {"raw": "{{base_url}}/admin/entreprises/1/validate"}
+          }
+        },
+        {
+          "name": "Statistiques",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{base_url}}/admin/stats"}
+          }
+        }
+      ]
+    }
+  ]
+}
