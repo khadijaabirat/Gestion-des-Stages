@@ -1,6 +1,17 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
+
 export default function BackgroundEffects() {
+  const pathname = usePathname();
+  if (
+    pathname === '/login' || 
+    pathname === '/register' || 
+    pathname.startsWith('/etudiant') || 
+    pathname.startsWith('/entreprise') || 
+    pathname.startsWith('/admin')
+  ) return null;
+
   return (
     <>
       <div className="fixed top-0 left-0 w-full h-full -z-10 overflow-hidden bg-background">
