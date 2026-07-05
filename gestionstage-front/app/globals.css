@@ -13,7 +13,30 @@
   
   body {
     font-family: var(--font-inter);
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
+
+  /* ─── Dark Mode Overrides ─── */
+  .dark {
+    --tw-bg-opacity: 1;
+    color-scheme: dark;
+  }
+  .dark body,
+  .dark .bg-background { background-color: #0c0e14; }
+  .dark .bg-surface { background-color: #0c0e14; }
+  .dark .text-on-background,
+  .dark .text-on-surface { color: #e8eaed; }
+  .dark .text-on-surface-variant { color: #a5a8b2; }
+  .dark .bg-surface-container-lowest { background-color: #0c0e14; }
+  .dark .bg-surface-container-low { background-color: #12141c; }
+  .dark .bg-surface-container { background-color: #181a24; }
+  .dark .bg-surface-container-high { background-color: #1e2030; }
+  .dark .bg-surface-container-highest { background-color: #262838; }
+  .dark .border-outline-variant { border-color: #3a3c4e; }
+  .dark .border-white\/80 { border-color: rgba(255,255,255,0.08); }
+  .dark .border-white\/50 { border-color: rgba(255,255,255,0.06); }
+  .dark .bg-white\/60 { background-color: rgba(30,32,48,0.60); }
+  .dark .bg-white\/80 { background-color: rgba(30,32,48,0.80); }
 }
 
 @layer components {
