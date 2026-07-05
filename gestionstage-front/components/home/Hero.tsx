@@ -1,9 +1,23 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import Image from 'next/image';
+import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
-import { Check, Play } from 'lucide-react';
+import { Check, Play, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
+
+const Globe3D = dynamic(() => import('./Globe3D'), { 
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full flex items-center justify-center">
+      <div className="relative w-24 h-24">
+        <div className="absolute inset-0 rounded-full border-4 border-primary/20" />
+        <div className="absolute inset-0 rounded-full border-4 border-t-primary animate-spin" />
+        <div className="absolute inset-2 rounded-full border-2 border-t-secondary animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }} />
+      </div>
+    </div>
+  )
+});
 
 export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -46,9 +60,16 @@ export default function Hero() {
             Connectez-vous avec des entreprises d&apos;élite grâce à notre moteur de mise en relation basé sur l&apos;IA. Expérimentez une approche ultra-moderne pour lancer votre carrière avec un suivi transparent et des mentors vérifiés.
           </p>
           <div className="flex flex-wrap gap-4 mt-4">
-            <button className="bg-gradient-to-r from-primary to-tertiary text-on-primary font-semibold px-8 py-4 rounded-xl spring-interactive shadow-lg shadow-primary/30">
-              Explorer les rôles
-            </button>
+            <Link href="/register?role=etudiant">
+              <motion.button
+                whileHover={{ scale: 1.05, y: -3 }}
+                whileTap={{ scale: 0.95 }}
+                className="bg-gradient-to-r from-primary to-tertiary text-on-primary font-semibold px-8 py-4 rounded-xl spring-interactive shadow-lg shadow-primary/30 flex items-center gap-2"
+              >
+                Explorer les rôles
+                <ArrowRight className="w-5 h-5" />
+              </motion.button>
+            </Link>
             <button className="glass-panel text-on-background font-semibold px-8 py-4 rounded-xl spring-interactive flex items-center gap-2 hover:border-primary/50">
               <Play className="w-5 h-5" />
               Voir la démo
@@ -56,16 +77,17 @@ export default function Hero() {
           </div>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, scale: 0.98 }} whileInView={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8 }} viewport={{ once: true }} className="col-span-1 lg:col-span-6 relative h-[400px] lg:h-[600px] rounded-3xl overflow-hidden glass-panel group">
-          <div className="absolute inset-0 z-0 bg-gradient-to-br from-primary/10 to-secondary/10" />
-          <div className="relative w-full h-full flex items-center justify-center p-4">
-            <Image
-              src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&h=600&fit=crop"
-              alt="Nexus Portal 2026"
-              fill
-              className="object-cover rounded-2xl drop-shadow-2xl transition-transform duration-1000 group-hover:scale-105"
-            />
-          </div>
+        {/* 3D Globe Animation - The "Kora Ardiya" */}
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.98 }} 
+          whileInView={{ opacity: 1, scale: 1 }} 
+          transition={{ duration: 0.8 }} 
+          viewport={{ once: true }} 
+          className="col-span-1 lg:col-span-6 relative h-[400px] lg:h-[600px] rounded-3xl overflow-hidden group"
+        >
+          <Globe3D />
+          
+          {/* Floating activity card */}
           <div className="absolute top-8 right-8 glass-panel rounded-2xl p-4 animate-float z-20 hover:scale-105 transition-transform border border-primary/30">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center">
