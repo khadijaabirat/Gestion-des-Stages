@@ -4,6 +4,8 @@ import './globals.css';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import BackgroundEffects from '@/components/ui/BackgroundEffects';
+import ThemeProvider from '@/components/providers/ThemeProvider';
+import { Toaster } from 'react-hot-toast';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const jakarta = Plus_Jakarta_Sans({ subsets: ['latin'], variable: '--font-jakarta' });
@@ -18,10 +20,35 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="fr" className="light">
       <body className={`${inter.variable} ${jakarta.variable} ${jetbrains.variable} bg-background text-on-background min-h-screen flex flex-col font-sans antialiased selection:bg-primary-container selection:text-on-primary-container relative`}>
-        <BackgroundEffects />
-        <Navbar />
-        {children}
-        <Footer />
+        <ThemeProvider>
+          <BackgroundEffects />
+          <Navbar />
+          <Toaster 
+            position="top-right"
+            toastOptions={{
+              className: 'font-sans text-sm rounded-xl border border-outline-variant/30 shadow-lg',
+              style: {
+                background: 'rgba(255, 255, 255, 0.9)',
+                backdropFilter: 'blur(10px)',
+                color: '#1a1a1a',
+              },
+              success: {
+                iconTheme: {
+                  primary: '#10b981',
+                  secondary: '#fff',
+                },
+              },
+              error: {
+                iconTheme: {
+                  primary: '#ef4444',
+                  secondary: '#fff',
+                },
+              },
+            }}
+          />
+          {children}
+          <Footer />
+        </ThemeProvider>
       </body>
     </html>
   );
