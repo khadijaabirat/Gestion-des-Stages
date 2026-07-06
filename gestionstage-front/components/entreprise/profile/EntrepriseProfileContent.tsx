@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence, useMotionValue } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, Save, Edit2, CheckCircle, AlertCircle, Lock, Building2, MapPin, Phone, Mail, Globe, FileText, Image as ImageIcon } from 'lucide-react';
 import { apiFetch, authHeaders, API_BASE, getAvatarUrl } from '@/lib/api';
 import Link from 'next/link';
@@ -27,11 +27,7 @@ export default function EntrepriseProfileContent() {
   
   const [pwForm, setPwForm] = useState({ current_password: '', new_password: '', new_password_confirmation: '' });
 
-  // Mouse cursor glow state
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [cursorGlowOpacity, setCursorGlowOpacity] = useState(0);
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
+
 
   const showToast = (msg: string, type: 'success'|'error' = 'success') => {
     setToast({ show: true, msg, type });
@@ -44,7 +40,7 @@ export default function EntrepriseProfileContent() {
       const res = await apiFetch('/profil');
       if (!res.ok) throw new Error('Erreur de chargement du profil');
       const data = await res.json();
-      const u = data.data;
+      const u = data.data ?? data;
       setUserData(u);
       setForm({ 
         nom: u.nom || '', 
@@ -64,25 +60,7 @@ export default function EntrepriseProfileContent() {
 
   useEffect(() => { fetchProfile(); }, [fetchProfile]);
 
-  // Mouse follow glow effect
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      mouseX.set(e.clientX);
-      mouseY.set(e.clientY);
-      setMousePosition({ x: e.clientX, y: e.clientY });
-      setCursorGlowOpacity(1);
-    };
-    const handleMouseLeave = () => setCursorGlowOpacity(0);
-    
-    if (window.matchMedia('(pointer: fine)').matches) {
-      window.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseleave', handleMouseLeave);
-    }
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseleave', handleMouseLeave);
-    };
-  }, [mouseX, mouseY]);
+
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -171,26 +149,7 @@ export default function EntrepriseProfileContent() {
 
   return (
     <div className="h-full w-full relative overflow-x-hidden bg-background">
-      {/* Background Pattern */}
-      <motion.div
-        className="fixed inset-0 pointer-events-none z-0 opacity-40"
-        style={{
-          backgroundImage: `
-            linear-gradient(rgba(165,59,34, 0.05) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(165,59,34, 0.05) 1px, transparent 1px)
-          `,
-          backgroundSize: '40px 40px',
-        }}
-      />
-      
-      {/* Cursor Follow Glow Effect */}
-      <motion.div
-        className="pointer-events-none fixed inset-0 z-50 transition-opacity duration-500 mix-blend-multiply"
-        style={{
-          opacity: cursorGlowOpacity,
-          background: `radial-gradient(800px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(165,59,34, 0.08) 0%, transparent 50%)`,
-        }}
-      />
+
       
       {/* Toast */}
       <AnimatePresence>

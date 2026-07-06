@@ -27,6 +27,9 @@ interface Candidate {
   offerId: string;
   offerTitle: string;
   motivation?: string;
+  conventionStatus?: 'non_generee' | 'generee' | 'en_signature' | 'signee';
+  signatureLinkEntreprise?: string;
+  conventionPdfPath?: string;
 }
 
 // 3D Card for Candidates
@@ -140,11 +143,6 @@ const CandidateCard3D = ({ candidate, getStatusBadgeColor, getMatchScoreColor, s
 
 export default function EntrepriseCandidatesContent() {
   const router = useRouter();
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [cursorGlowOpacity, setCursorGlowOpacity] = useState(0);
-
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
 
   // Data State
   const [candidates, setCandidates] = useState<Candidate[]>([]);
@@ -185,6 +183,9 @@ export default function EntrepriseCandidatesContent() {
           offerTitle: c.offre_stage?.titre || 'Offre supprimée',
           cvUrl: c.cv_file_snapshot ? `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/storage/${c.cv_file_snapshot}` : (c.cv?.file_path ? `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/storage/${c.cv.file_path}` : undefined),
           motivation: c.lettre_motivation || undefined,
+          conventionStatus: c.convention_statut || 'non_generee',
+          signatureLinkEntreprise: c.yousign_signature_link_entreprise || undefined,
+          conventionPdfPath: c.convention_pdf_path || undefined,
         }));
         setCandidates(mappedCandidates);
       }
@@ -197,25 +198,7 @@ export default function EntrepriseCandidatesContent() {
 
   useEffect(() => {
     fetchCandidates();
-
-    const handleMouseMove = (e: MouseEvent) => {
-      mouseX.set(e.clientX);
-      mouseY.set(e.clientY);
-      setMousePosition({ x: e.clientX, y: e.clientY });
-      setCursorGlowOpacity(1);
-    };
-    const handleMouseLeave = () => setCursorGlowOpacity(0);
-
-    if (window.matchMedia('(pointer: fine)').matches) {
-      window.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseleave', handleMouseLeave);
-    }
-
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseleave', handleMouseLeave);
-    };
-  }, [mouseX, mouseY]);
+  }, []);
 
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
     setToast({ show: true, message, type });
@@ -314,43 +297,46 @@ export default function EntrepriseCandidatesContent() {
     }
   };
 
+  const handleConventionAction = async (action: 'generate' | 'send-signature', candidatureId: string) => {
+    setIsProcessing(true);
+    try {
+      const res = await apiFetch(`/candidatures/${candidatureId}/convention/${action}`, { method: 'POST' });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.message || 'Erreur lors de l\'action convention');
+      }
+      showToast(`Action ${action === 'generate' ? 'Génération' : 'Envoi'} effectuée avec succès !`);
+      fetchCandidates();
+      if (selectedCandidate) {
+        setSelectedCandidate(null); // Simple way to force refresh of drawer state
+      }
+    } catch (e: any) {
+      showToast(e.message, 'error');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const downloadConvention = async (candidatureId: string) => {
+    try {
+      const response = await apiFetch(`/candidatures/${candidatureId}/convention/download`);
+      if (!response.ok) throw new Error('Convention non disponible');
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Convention_Stage_${candidatureId}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (e: any) {
+      showToast(e.message, 'error');
+    }
+  };
+
   return (
-    <div className="h-full w-full relative overflow-x-hidden bg-background text-on-background pb-24 md:pb-10">
-      {/* Background Pattern */}
-      <motion.div
-        className="fixed inset-0 pointer-events-none z-0"
-        style={{
-          backgroundImage: `
-            linear-gradient(rgba(165,59,34, 0.05) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(165,59,34, 0.05) 1px, transparent 1px)
-          `,
-          backgroundSize: '40px 40px',
-          backgroundPosition: `${mousePosition.x / 10}px ${mousePosition.y / 10}px`,
-          transition: 'background-position 0.2s ease-out'
-        }}
-      />
-      <div 
-        className="fixed inset-0 pointer-events-none z-[-1] opacity-[0.03]"
-        style={{
-          backgroundImage: `
-            radial-gradient(circle at 100% 150%, var(--tw-colors-primary-container) 24%, transparent 24%),
-            radial-gradient(circle at 0% 150%, var(--tw-colors-secondary-container) 24%, transparent 24%),
-            radial-gradient(circle at 50% 100%, var(--tw-colors-surface-container) 10%, transparent 10%)
-          `,
-          backgroundSize: '60px 60px',
-          backgroundPosition: '0 0, 30px 0, 15px 30px'
-        }}
-      />
-
-      {/* Dynamic Cursor Glow */}
-      <motion.div
-        className="pointer-events-none fixed inset-0 z-50 transition-opacity duration-500 mix-blend-multiply"
-        style={{
-          opacity: cursorGlowOpacity,
-          background: `radial-gradient(800px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(255,126,95, 0.08) 0%, transparent 60%)`
-        }}
-      />
-
+    <div className="h-full w-full relative overflow-x-hidden text-on-background pb-24 md:pb-10">
       {/* Main Content Area */}
       <main className="w-full p-4 md:p-10 relative z-10 flex flex-col max-w-[1400px] mx-auto gap-6">
         
@@ -640,6 +626,92 @@ export default function EntrepriseCandidatesContent() {
                     <p className="text-sm text-on-surface-variant leading-relaxed whitespace-pre-wrap italic">
                       "{selectedCandidate.motivation}"
                     </p>
+                  </div>
+                )}
+
+                {/* Section Convention de Stage (visible only if Accepted) */}
+                {selectedCandidate.status === 'Accepté' && (
+                  <div className="space-y-4 mb-8 bg-blue-50/50 rounded-2xl p-5 border border-blue-200">
+                    <h3 className="font-label-caps text-xs font-bold text-blue-800 uppercase tracking-wider flex items-center gap-2 mb-4">
+                      <span className="material-symbols-outlined text-[18px]">contract</span>
+                      Convention de Stage
+                    </h3>
+                    
+                    <div className="flex flex-col gap-3">
+                      {(!selectedCandidate.conventionStatus || selectedCandidate.conventionStatus === 'non_generee') && (
+                        <div className="flex items-center justify-between p-3 bg-white rounded-xl border border-blue-100 shadow-sm">
+                          <p className="text-sm font-medium text-on-surface-variant">La convention n'a pas encore été générée.</p>
+                          <button
+                            onClick={() => handleConventionAction('generate', selectedCandidate.id)}
+                            disabled={isProcessing}
+                            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition-colors disabled:opacity-50"
+                          >
+                            Générer Convention
+                          </button>
+                        </div>
+                      )}
+
+                      {selectedCandidate.conventionStatus === 'generee' && (
+                        <div className="flex flex-col gap-3 p-3 bg-white rounded-xl border border-blue-100 shadow-sm">
+                          <div className="flex items-center justify-between">
+                            <p className="text-sm font-medium text-green-700 flex items-center gap-2">
+                              <span className="material-symbols-outlined text-[18px]">task_alt</span>
+                              Générée avec succès
+                            </p>
+                            <button
+                              onClick={() => downloadConvention(selectedCandidate.id)}
+                              className="text-blue-600 text-xs font-bold hover:underline flex items-center gap-1"
+                            >
+                              Voir PDF
+                            </button>
+                          </div>
+                          <button
+                            onClick={() => handleConventionAction('send-signature', selectedCandidate.id)}
+                            disabled={isProcessing}
+                            className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                          >
+                            <span className="material-symbols-outlined text-[16px]">send</span>
+                            Envoyer pour signature (Yousign)
+                          </button>
+                        </div>
+                      )}
+
+                      {selectedCandidate.conventionStatus === 'en_signature' && (
+                        <div className="flex flex-col gap-3 p-4 bg-amber-50 rounded-xl border border-amber-200 shadow-sm">
+                          <p className="text-sm font-bold text-amber-800 flex items-center gap-2">
+                            <span className="material-symbols-outlined text-[18px]">draw</span>
+                            En attente de signatures
+                          </p>
+                          {selectedCandidate.signatureLinkEntreprise ? (
+                            <a
+                              href={selectedCandidate.signatureLinkEntreprise}
+                              target="_blank" rel="noopener noreferrer"
+                              className="w-full bg-amber-500 hover:bg-amber-600 text-white px-4 py-2.5 rounded-lg text-xs font-bold transition-colors text-center shadow-sm"
+                            >
+                              Signer ma partie (Entreprise)
+                            </a>
+                          ) : (
+                            <p className="text-xs text-amber-700 italic">Vous avez déjà signé. En attente de l'étudiant.</p>
+                          )}
+                        </div>
+                      )}
+
+                      {selectedCandidate.conventionStatus === 'signee' && (
+                        <div className="flex items-center justify-between p-4 bg-green-50 rounded-xl border border-green-200 shadow-sm">
+                          <p className="text-sm font-bold text-green-800 flex items-center gap-2">
+                            <span className="material-symbols-outlined text-[18px]">verified</span>
+                            Convention Signée !
+                          </p>
+                          <button
+                            onClick={() => downloadConvention(selectedCandidate.id)}
+                            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition-colors flex items-center gap-1"
+                          >
+                            <span className="material-symbols-outlined text-[14px]">download</span>
+                            Télécharger
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
 

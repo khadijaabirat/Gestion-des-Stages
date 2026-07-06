@@ -106,6 +106,13 @@ class AdminController extends Controller
         if ($request->action === 'approuver') {
             $entreprise->update(['est_valide' => true]);
             $entreprise->notify(new EntrepriseValidatedNotification());
+            
+            // Notification WhatsApp à l'entreprise
+            if ($entreprise->telephone) {
+                $waService = new \App\Services\WhatsAppService();
+                $waService->notifyAccountValidated($entreprise->telephone, $entreprise->nom);
+            }
+
             $message = "L'entreprise a été approuvée. Elle peut maintenant publier des offres.";
         } else {
             $entreprise->delete();

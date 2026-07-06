@@ -1,20 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence, useMotionValue } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 
 import Link from 'next/link';
 import { apiFetch } from '@/lib/api';
 
 export default function EntrepriseDashboardContent() {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [cursorGlowOpacity, setCursorGlowOpacity] = useState(0);
-  const [scrollY, setScrollY] = useState(0);
-
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-  
   const [showSpeedDial, setShowSpeedDial] = useState(false);
   const [stats, setStats] = useState<any>(null);
 
@@ -33,72 +26,13 @@ export default function EntrepriseDashboardContent() {
     fetchStats();
   }, []);
 
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      mouseX.set(e.clientX);
-      mouseY.set(e.clientY);
-      setMousePosition({ x: e.clientX, y: e.clientY });
-      setCursorGlowOpacity(1);
-    };
-    const handleMouseLeave = () => setCursorGlowOpacity(0);
-    const handleScroll = () => setScrollY(window.scrollY);
-
-    if (window.matchMedia('(pointer: fine)').matches) {
-      window.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseleave', handleMouseLeave);
-    }
-    window.addEventListener('scroll', handleScroll);
-
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseleave', handleMouseLeave);
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, [mouseX, mouseY]);
-
   const totalCandidats = stats?.total_candidatures || 0;
   const candidaturesAcceptees = stats?.candidatures_acceptees || 0;
   const entretiensCount = stats?.candidatures_en_attente || 0;
   const conversionRate = totalCandidats > 0 ? Math.round((candidaturesAcceptees / totalCandidats) * 100) : 0;
 
   return (
-    <div className="h-full w-full relative overflow-x-hidden bg-background text-on-background">
-      {/* Reactive Animated Grid Background */}
-      <div 
-        className="fixed inset-0 pointer-events-none z-0"
-        style={{
-          backgroundImage: `
-            linear-gradient(rgba(165,59,34, 0.05) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(165,59,34, 0.05) 1px, transparent 1px)
-          `,
-          backgroundSize: '40px 40px',
-          backgroundPosition: `${mousePosition.x / 10}px ${mousePosition.y / 10}px`,
-          transition: 'background-position 0.2s ease-out'
-        }}
-      />
-
-      {/* Zellige Pattern Overlay */}
-      <div 
-        className="fixed inset-0 pointer-events-none z-[-1] opacity-[0.03]"
-        style={{
-          backgroundImage: `
-            radial-gradient(circle at 100% 150%, var(--tw-colors-primary-container) 24%, transparent 24%),
-            radial-gradient(circle at 0% 150%, var(--tw-colors-secondary-container) 24%, transparent 24%),
-            radial-gradient(circle at 50% 100%, var(--tw-colors-surface-container) 10%, transparent 10%)
-          `,
-          backgroundSize: '60px 60px',
-          backgroundPosition: '0 0, 30px 0, 15px 30px'
-        }}
-      />
-
-      {/* Dynamic Cursor Glow */}
-      <motion.div
-        className="pointer-events-none fixed inset-0 z-50 transition-opacity duration-500 mix-blend-multiply"
-        style={{
-          opacity: cursorGlowOpacity,
-          background: `radial-gradient(800px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(255,126,95, 0.08) 0%, transparent 60%)`
-        }}
-      />
+    <div className="h-full w-full relative overflow-x-hidden text-on-background">
 
       {/* Mobile Top Header (Fallback for consistency) */}
       <div className="md:hidden flex justify-between items-center p-4 bg-surface/80 backdrop-blur-md sticky top-0 z-40 border-b border-outline-variant/20">

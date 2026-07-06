@@ -135,21 +135,30 @@ export default function ProfileContent() {
         method: 'POST', // POST with _method=PUT
         body: formData,
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Erreur');
-      setUserData(data.data);
+      const apiData = await res.json();
+      if (!res.ok) {
+        let errMsg = apiData.message || 'Erreur lors de la mise à jour.';
+        if (apiData.errors) {
+          const firstError = Object.values(apiData.errors)[0] as string[];
+          if (firstError && firstError.length > 0) {
+            errMsg = firstError[0];
+          }
+        }
+        throw new Error(errMsg);
+      }
+      setUserData(apiData.data);
       // Update photo preview: use the uploaded file preview if available, otherwise server URL
       if (selectedPhoto) {
         setPhotoPreview(URL.createObjectURL(selectedPhoto));
-      } else if (data.data.photo) {
-        setPhotoPreview(getAvatarUrl(data.data.nom, data.data.photo));
+      } else if (apiData.data.photo) {
+        setPhotoPreview(getAvatarUrl(apiData.data.nom, apiData.data.photo));
       } else {
-        setPhotoPreview(getAvatarUrl(data.data.nom));
+        setPhotoPreview(getAvatarUrl(apiData.data.nom));
       }
       setIsEditing(false);
       showToast('Profil mis à jour avec succès !');
     } catch (e: unknown) { 
-      const msg = isApiErrorResponse(e) ? e.message : 'Erreur';
+      const msg = e instanceof Error ? e.message : 'Erreur lors de la mise à jour.';
       showToast(msg, 'error'); 
     }
     finally { setIsSaving(false); }
@@ -317,7 +326,10 @@ export default function ProfileContent() {
             {activeTab === 'general' && (
               <motion.button
                 whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-                onClick={isEditing ? handleSubmit(onSubmit) : () => setIsEditing(true)}
+                onClick={isEditing ? handleSubmit(onSubmit, (errs) => {
+                  console.error('Validation errors:', errs);
+                  showToast('Veuillez vérifier les champs du formulaire.', 'error');
+                }) : () => setIsEditing(true)}
                 disabled={isSaving}
                 className={`px-5 py-2.5 rounded-xl font-semibold flex items-center gap-2 transition-all shadow-sm ${isEditing ? 'bg-primary text-white shadow-primary/30' : 'bg-white border border-outline-variant text-on-surface hover:bg-surface-container-high'}`}
               >

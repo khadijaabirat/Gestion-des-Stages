@@ -14,10 +14,16 @@ class Candidature extends Model
     protected $fillable = [
         'user_id',
         'offre_stage_id',
-        'cv_id',                
-        'cv_file_snapshot',    
+        'cv_id',
+        'cv_file_snapshot',
         'lettre_motivation',
         'statut',
+        'convention_pdf_path',
+        'yousign_procedure_id',
+        'yousign_signature_link_etudiant',
+        'yousign_signature_link_entreprise',
+        'convention_statut',
+        'convention_signed_at',
     ];
 
     protected $casts = [
@@ -59,7 +65,18 @@ class Candidature extends Model
             $etudiant = $this->etudiant;
             if ($etudiant) {
                 $this->loadMissing(['offreStage.entreprise']);
-                $etudiant->notify(new \App\Notifications\CandidatureNotification($this, $this->statut));
+                $statusValue = $this->statut instanceof \App\Enums\CandidatureStatus ? $this->statut->value : $this->statut;
+                $etudiant->notify(new \App\Notifications\CandidatureNotification($this, $statusValue));
+
+                // Envoyer la notification WhatsApp à l'étudiant
+                if ($etudiant->telephone) {
+                    $waService = new \App\Services\WhatsAppService();
+                    if ($statusValue === 'accepte') {
+                        $waService->notifyCandidatureAccepted($etudiant->telephone, $etudiant->nom, $this->offreStage->titre, $this->offreStage->entreprise->nom);
+                    } elseif ($statusValue === 'refuse') {
+                        $waService->notifyCandidatureRefused($etudiant->telephone, $etudiant->nom, $this->offreStage->titre, $this->offreStage->entreprise->nom);
+                    }
+                }
             }
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error("Erreur lors de l'envoi de la notification de candidature : " . $e->getMessage());

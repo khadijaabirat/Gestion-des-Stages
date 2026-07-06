@@ -41,4 +41,10 @@ return [
         'whatsapp_from' => env('TWILIO_WHATSAPP_FROM', 'whatsapp:+14155238886'),
     ],
 
+    'yousign' => [
+        'api_key'    => env('YOUSIGN_API_KEY', ''),
+        'base_url'   => env('YOUSIGN_BASE_URL', 'https://api-sandbox.yousign.app/v3'),
+        'test_email' => env('YOUSIGN_TEST_EMAIL'),
+    ],
+
 ];

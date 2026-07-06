@@ -112,6 +112,12 @@ try {
             $entreprise = $offre->entreprise; 
             $candidatureComplete = Candidature::with(['etudiant', 'offreStage.entreprise'])->find($candidature->id);
             $entreprise->notify(new CandidatureNotification($candidatureComplete, 'creation'));
+
+            // Notification WhatsApp à l'entreprise
+            if ($entreprise->telephone) {
+                $waService = new \App\Services\WhatsAppService();
+                $waService->notifyNewCandidature($entreprise->telephone, $entreprise->nom, $candidatureComplete->etudiant->nom, $offre->titre);
+            }
         } catch (\Exception $e) {
            Log::error($e->getMessage()) ;
         }

@@ -26,6 +26,13 @@ interface Candidate {
   niveauEtude?: string;
   bio?: string;
   motivation?: string;
+  conventionStatus?: 'non_generee' | 'generee' | 'en_signature' | 'signee';
+  signatureLinkEntreprise?: string;
+  conventionPdfPath?: string;
+  filiere?: string;
+  niveauEtude?: string;
+  bio?: string;
+  motivation?: string;
 }
 
 interface EntrepriseOfferCandidatesContentProps {
@@ -90,6 +97,9 @@ export default function EntrepriseOfferCandidatesContent({ offerId }: Entreprise
           niveauEtude: cand.etudiant?.niveau_etude || undefined,
           bio: cand.etudiant?.bio || undefined,
           motivation: cand.lettre_motivation || undefined,
+          conventionStatus: cand.convention_statut || 'non_generee',
+          signatureLinkEntreprise: cand.yousign_signature_link_entreprise || undefined,
+          conventionPdfPath: cand.convention_pdf_path || undefined,
         }));
         setCandidates(mappedCandidates);
 
@@ -200,6 +210,41 @@ export default function EntrepriseOfferCandidatesContent({ offerId }: Entreprise
       const a = document.createElement('a');
       a.href = url;
       a.download = `CV_Candidature_${candidatureId}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (e: any) {
+      showToast(e.message, 'error');
+    }
+  };
+
+  const handleConventionAction = async (action: 'generate' | 'send-signature', candidatureId: string) => {
+    setIsProcessing(candidatureId + '_' + action);
+    try {
+      const res = await apiFetch(`/candidatures/${candidatureId}/convention/${action}`, { method: 'POST' });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.message || 'Erreur lors de l\'action convention');
+      }
+      showToast(`Action ${action === 'generate' ? 'Génération' : 'Envoi'} effectuée avec succès !`);
+      fetchCandidates(); // Refresh to get updated status and links
+    } catch (e: any) {
+      showToast(e.message, 'error');
+    } finally {
+      setIsProcessing(null);
+    }
+  };
+
+  const downloadConvention = async (candidatureId: string) => {
+    try {
+      const response = await apiFetch(`/candidatures/${candidatureId}/convention/download`);
+      if (!response.ok) throw new Error('Convention non disponible');
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Convention_Stage_${candidatureId}.pdf`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
@@ -567,6 +612,92 @@ export default function EntrepriseOfferCandidatesContent({ offerId }: Entreprise
                     <p className="text-sm text-on-surface-variant leading-relaxed whitespace-pre-wrap italic">
                       "{cvPreviewCandidate.motivation}"
                     </p>
+                  </div>
+                )}
+
+                {/* Section Convention de Stage (visible only if Accepted) */}
+                {cvPreviewCandidate.status === 'Accepté' && (
+                  <div className="space-y-4 mb-8 bg-blue-50/50 rounded-2xl p-5 border border-blue-200">
+                    <h3 className="font-label-caps text-xs font-bold text-blue-800 uppercase tracking-wider flex items-center gap-2 mb-4">
+                      <span className="material-symbols-outlined text-[18px]">contract</span>
+                      Convention de Stage
+                    </h3>
+                    
+                    <div className="flex flex-col gap-3">
+                      {cvPreviewCandidate.conventionStatus === 'non_generee' && (
+                        <div className="flex items-center justify-between p-3 bg-white rounded-xl border border-blue-100 shadow-sm">
+                          <p className="text-sm font-medium text-on-surface-variant">La convention n'a pas encore été générée.</p>
+                          <button
+                            onClick={() => handleConventionAction('generate', cvPreviewCandidate.id)}
+                            disabled={isProcessing !== null}
+                            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition-colors disabled:opacity-50"
+                          >
+                            Générer Convention
+                          </button>
+                        </div>
+                      )}
+
+                      {cvPreviewCandidate.conventionStatus === 'generee' && (
+                        <div className="flex flex-col gap-3 p-3 bg-white rounded-xl border border-blue-100 shadow-sm">
+                          <div className="flex items-center justify-between">
+                            <p className="text-sm font-medium text-green-700 flex items-center gap-2">
+                              <span className="material-symbols-outlined text-[18px]">task_alt</span>
+                              Générée avec succès
+                            </p>
+                            <button
+                              onClick={() => downloadConvention(cvPreviewCandidate.id)}
+                              className="text-blue-600 text-xs font-bold hover:underline flex items-center gap-1"
+                            >
+                              Voir PDF
+                            </button>
+                          </div>
+                          <button
+                            onClick={() => handleConventionAction('send-signature', cvPreviewCandidate.id)}
+                            disabled={isProcessing !== null}
+                            className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                          >
+                            <span className="material-symbols-outlined text-[16px]">send</span>
+                            Envoyer pour signature (Yousign)
+                          </button>
+                        </div>
+                      )}
+
+                      {cvPreviewCandidate.conventionStatus === 'en_signature' && (
+                        <div className="flex flex-col gap-3 p-4 bg-amber-50 rounded-xl border border-amber-200 shadow-sm">
+                          <p className="text-sm font-bold text-amber-800 flex items-center gap-2">
+                            <span className="material-symbols-outlined text-[18px]">draw</span>
+                            En attente de signatures
+                          </p>
+                          {cvPreviewCandidate.signatureLinkEntreprise ? (
+                            <a
+                              href={cvPreviewCandidate.signatureLinkEntreprise}
+                              target="_blank" rel="noopener noreferrer"
+                              className="w-full bg-amber-500 hover:bg-amber-600 text-white px-4 py-2.5 rounded-lg text-xs font-bold transition-colors text-center shadow-sm"
+                            >
+                              Signer ma partie (Entreprise)
+                            </a>
+                          ) : (
+                            <p className="text-xs text-amber-700 italic">Vous avez déjà signé. En attente de l'étudiant.</p>
+                          )}
+                        </div>
+                      )}
+
+                      {cvPreviewCandidate.conventionStatus === 'signee' && (
+                        <div className="flex items-center justify-between p-4 bg-green-50 rounded-xl border border-green-200 shadow-sm">
+                          <p className="text-sm font-bold text-green-800 flex items-center gap-2">
+                            <span className="material-symbols-outlined text-[18px]">verified</span>
+                            Convention Signée !
+                          </p>
+                          <button
+                            onClick={() => downloadConvention(cvPreviewCandidate.id)}
+                            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition-colors flex items-center gap-1"
+                          >
+                            <span className="material-symbols-outlined text-[14px]">download</span>
+                            Télécharger
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
 

@@ -12,7 +12,11 @@ use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\Api\CandidatureController;
 use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\ConventionController;
 use App\Http\Controllers\Api\UserController;
+
+// Yousign webhook (no auth — called by Yousign servers)
+Route::post('/conventions/webhook/yousign', [ConventionController::class, 'webhook']);
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login');
@@ -61,7 +65,16 @@ Route::get('/home/data', [\App\Http\Controllers\Api\PublicController::class, 'ho
     // Users Search and Public Profiles
     Route::get('/users/search', [UserController::class, 'search']);
     Route::get('/users/{id}', [UserController::class, 'showPublicProfile']);
-   
+
+    // Conventions de stage
+    Route::get('/candidatures/{id}/convention/status', [ConventionController::class, 'status']);
+    Route::get('/candidatures/{id}/convention/download', [ConventionController::class, 'download']);
+
+    Route::middleware('role:entreprise')->group(function () {
+        Route::post('/candidatures/{id}/convention/generate', [ConventionController::class, 'generate']);
+        Route::post('/candidatures/{id}/convention/send-signature', [ConventionController::class, 'sendForSignature']);
+    });
+
     Route::middleware('role:entreprise')->group(function () {
         Route::post('/entreprise/offres', [OffreStageController::class, 'store']);
         Route::put('/entreprise/offres/{id}', [OffreStageController::class, 'update']);

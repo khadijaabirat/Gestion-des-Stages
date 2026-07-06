@@ -10,6 +10,9 @@ interface Candidature {
   id: number;
   statut: 'en_attente' | 'accepte' | 'refuse' | 'annule';
   lettre_motivation: string | null;
+  convention_statut?: 'non_generee' | 'generee' | 'en_signature' | 'signee';
+  convention_pdf_path?: string;
+  yousign_signature_link_etudiant?: string;
   created_at: string;
   updated_at: string;
   offreStage?: {
@@ -63,13 +66,6 @@ export default function ApplicationsContent() {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'all' | 'en_attente' | 'accepte' | 'refuse' | 'annule'>('all');
   const [cancellingId, setCancellingId] = useState<number | null>(null);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => setMousePosition({ x: e.clientX, y: e.clientY });
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
 
   const fetchCandidatures = useCallback(async () => {
     try {
@@ -112,6 +108,39 @@ export default function ApplicationsContent() {
     }
   };
 
+  const signConvention = async (candidatureId: number) => {
+    try {
+      const res = await apiFetch(`/candidatures/${candidatureId}/convention/status`);
+      if (!res.ok) throw new Error('Erreur');
+      const data = await res.json();
+      if (data.signature_link) {
+        window.open(data.signature_link, '_blank');
+      } else {
+        toast.error('Lien de signature non disponible.');
+      }
+    } catch (e: any) {
+      toast.error(e.message);
+    }
+  };
+
+  const downloadConvention = async (candidatureId: number) => {
+    try {
+      const response = await apiFetch(`/candidatures/${candidatureId}/convention/download`);
+      if (!response.ok) throw new Error('Convention non disponible');
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Convention_Stage_${candidatureId}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (e: any) {
+      toast.error(e.message);
+    }
+  };
+
   const TABS = [
     { key: 'all', label: 'Toutes', count: candidatures.length },
     { key: 'en_attente', label: 'En attente', count: candidatures.filter(c => c.statut === 'en_attente').length },
@@ -131,19 +160,8 @@ export default function ApplicationsContent() {
 
   return (
     <div className="h-full w-full relative overflow-x-hidden bg-background">
-      {/* Cursor Glow */}
-      <div
-        className="pointer-events-none fixed inset-0 z-50 transition-opacity duration-300"
-        style={{
-          background: `radial-gradient(600px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(165,59,34, 0.06), transparent 70%)`
-        }}
-      />
-
-      {/* Ambient gradients */}
-      <motion.div
-        animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.2, 0.1] }}
-        transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
-        className="fixed top-0 left-0 w-[500px] h-[500px] rounded-full blur-3xl pointer-events-none z-0"
+      {/* Static ambient gradient */}
+      <div className="fixed top-0 left-0 w-[500px] h-[500px] rounded-full blur-3xl pointer-events-none z-0 opacity-10"
         style={{ background: 'radial-gradient(circle, rgba(165,59,34, 0.1) 0%, transparent 70%)' }}
       />
 
@@ -276,6 +294,8 @@ export default function ApplicationsContent() {
                     index={index}
                     onCancel={handleCancel}
                     isCancelling={cancellingId === candidature.id}
+                    onDownloadConvention={downloadConvention}
+                    onSignConvention={signConvention}
                   />
                 ))}
               </div>
@@ -292,11 +312,15 @@ function CandidatureCard({
   index,
   onCancel,
   isCancelling,
+  onDownloadConvention,
+  onSignConvention,
 }: {
   candidature: Candidature;
   index: number;
   onCancel: (id: number) => void;
   isCancelling: boolean;
+  onDownloadConvention: (id: number) => void;
+  onSignConvention: (id: number) => void;
 }) {
   const [showMotivation, setShowMotivation] = useState(false);
   const config = STATUS_CONFIG[candidature.statut] || STATUS_CONFIG.annule;
@@ -407,6 +431,49 @@ function CandidatureCard({
               </motion.p>
             )}
           </AnimatePresence>
+        </div>
+      )}
+
+      {/* Convention de Stage Block */}
+      {candidature.statut === 'accepte' && (
+        <div className="mt-4 pt-4 border-t border-outline-variant/20">
+          <div className="flex flex-col gap-3 p-4 bg-blue-50/50 rounded-xl border border-blue-100">
+            <h4 className="text-sm font-bold text-blue-800 flex items-center gap-2 mb-1">
+              <FileText className="w-4 h-4" />
+              Convention de Stage
+            </h4>
+            
+            {(!candidature.convention_statut || candidature.convention_statut === 'non_generee' || candidature.convention_statut === 'generee') && (
+              <p className="text-xs text-blue-700">En attente de génération par l'entreprise.</p>
+            )}
+
+            {candidature.convention_statut === 'en_signature' && (
+              <div className="flex flex-col gap-2">
+                <p className="text-xs text-amber-700 font-medium">L'entreprise a envoyé la convention. Elle est en attente de votre signature.</p>
+                <button
+                  onClick={() => onSignConvention(candidature.id)}
+                  className="w-fit bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg text-xs font-bold transition-colors shadow-sm"
+                >
+                  Signer ma convention (Yousign)
+                </button>
+              </div>
+            )}
+
+            {candidature.convention_statut === 'signee' && (
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-bold text-green-700 flex items-center gap-1.5">
+                  <CheckCircle className="w-4 h-4" />
+                  Convention Signée
+                </p>
+                <button
+                  onClick={() => onDownloadConvention(candidature.id)}
+                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition-colors"
+                >
+                  Télécharger le PDF
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </motion.div>
