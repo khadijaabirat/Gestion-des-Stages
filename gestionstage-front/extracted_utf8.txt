@@ -1,0 +1,36 @@
+﻿
+> C:\Users\safiy\.gemini\antigravity\brain\fdd3c254-392b-47dd-99d2-7a93e6f31922\.system_generated\logs\overview.txt:308
+:{"step_index":855,"source":"MODEL","type":"PLANNER_RESPONSE","status":"DONE","created_at":"2026-06-16T09:51:12Z","tool
+_calls":[{"name":"run_command","args":{"CommandLine":"\"Get-Content C:\\\\Users\\\\safiy\\\\.gemini\\\\antigravity\\\\b
+rain\\\\fdd3c254-392b-47dd-99d2-7a93e6f31922\\\\.system_generated\\\\logs\\\\overview.txt | Select-String -Pattern 
+'\\\"Zellige Pattern' -Context 20, 20\"","Cwd":"\"c:\\\\xampp\\\\htdocs\\\\Gestion de 
+Stages\\\\gestionstage-front\"","SafeToAutoRun":"true","WaitMsBeforeAsync":"5000"}}]}
+  C:\Users\safiy\.gemini\antigravity\brain\fdd3c254-392b-47dd-99d2-7a93e6f31922\.system_generated\logs\overview.txt:309
+:{"step_index":858,"source":"MODEL","type":"PLANNER_RESPONSE","status":"DONE","created_at":"2026-06-16T09:51:23Z","tool
+_calls":[{"name":"run_command","args":{"CommandLine":"\"Get-Item C:\\\\Users\\\\safiy\\\\.gemini\\\\antigravity\\\\brai
+n\\\\fdd3c254-392b-47dd-99d2-7a93e6f31922\\\\.system_generated\\\\logs\\\\overview.txt\"","Cwd":"\"c:\\\\xampp\\\\htdoc
+s\\\\Gestion de Stages\\\\gestionstage-front\"","SafeToAutoRun":"true","WaitMsBeforeAsync":"5000"}}]}
+  C:\Users\safiy\.gemini\antigravity\brain\fdd3c254-392b-47dd-99d2-7a93e6f31922\.system_generated\logs\overview.txt:310
+:{"step_index":861,"source":"MODEL","type":"PLANNER_RESPONSE","status":"DONE","created_at":"2026-06-16T09:51:30Z","tool
+_calls":[{"name":"run_command","args":{"CommandLine":"\"Get-ChildItem -Path 
+\\\"C:\\\\Users\\\\safiy\\\\AppData\\\\Roaming\\\\Code\\\\User\\\\History\\\" -Recurse -Filter 
+\\\"*EntrepriseDashboardContent.tsx*\\\" -File\"","Cwd":"\"c:\\\\xampp\\\\htdocs\\\\Gestion de 
+Stages\\\\gestionstage-front\"","SafeToAutoRun":"true","WaitMsBeforeAsync":"5000"}}]}
+  C:\Users\safiy\.gemini\antigravity\brain\fdd3c254-392b-47dd-99d2-7a93e6f31922\.system_generated\logs\overview.txt:311
+:{"step_index":864,"source":"MODEL","type":"PLANNER_RESPONSE","status":"DONE","created_at":"2026-06-16T09:51:39Z","tool
+_calls":[{"name":"run_command","args":{"CommandLine":"\"Get-ChildItem -Path 
+\\\"C:\\\\Users\\\\safiy\\\\AppData\\\\Roaming\\\\Code\\\\User\\\\History\\\" -Recurse -File -Include 
+\\\"entries.json\\\" | Get-Content | Select-String \\\"EntrepriseDashboardContent.tsx\\\" -Context 0, 
+5\"","Cwd":"\"c:\\\\xampp\\\\htdocs\\\\Gestion de 
+Stages\\\\gestionstage-front\"","SafeToAutoRun":"true","WaitMsBeforeAsync":"5000"}}]}
+  C:\Users\safiy\.gemini\antigravity\brain\fdd3c254-392b-47dd-99d2-7a93e6f31922\.system_generated\logs\overview.txt:312
+:{"step_index":867,"source":"MODEL","type":"PLANNER_RESPONSE","status":"DONE","created_at":"2026-06-16T09:51:52Z","tool
+_calls":[{"name":"command_status","args":{"CommandId":"\"61d8ab07-5abc-4c84-875f-a567667d1420\"","WaitDurationSeconds":
+"10"}}]}
+  C:\Users\safiy\.gemini\antigravity\brain\fdd3c254-392b-47dd-99d2-7a93e6f31922\.system_generated\logs\overview.txt:313
+:{"step_index":870,"source":"MODEL","type":"PLANNER_RESPONSE","status":"DONE","created_at":"2026-06-16T09:51:59Z","tool
+_calls":[{"name":"run_command","args":{"CommandLine":"\"findstr /S /M /C:\\\"Zellige\\\" C:\\\\Users\\\\safiy\\\\AppDat
+a\\\\Roaming\\\\Code\\\\User\\\\History\\\\*\"","Cwd":"\"c:\\\\xampp\\\\htdocs\\\\Gestion de 
+Stages\\\\gestionstage-front\"","SafeToAutoRun":"true","WaitMsBeforeAsync":"5000"}}]}
+
+
