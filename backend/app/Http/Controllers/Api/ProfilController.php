@@ -53,13 +53,28 @@ class ProfilController extends Controller
         if ($request->hasFile('photo')) {
             // Supprimer l'ancienne photo si elle existe
             if ($user->photo) {
-                $oldPath = str_replace('/storage/', '', $user->photo);
-                if (\Illuminate\Support\Facades\Storage::disk('public')->exists($oldPath)) {
-                    \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
+                if (str_starts_with($user->photo, 'http')) {
+                    // Cloudinary handles overwrites if public_id is used, or we just leave it for now.
+                } else {
+                    $oldPath = str_replace('/storage/', '', $user->photo);
+                    if (\Illuminate\Support\Facades\Storage::disk('public')->exists($oldPath)) {
+                        \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
+                    }
                 }
             }
-            $path = $request->file('photo')->store('photos', 'public');
-            $validatedData['photo'] = '/storage/' . $path;
+
+            if (env('CLOUDINARY_URL') && env('CLOUDINARY_URL') !== 'cloudinary://API_KEY:API_SECRET@CLOUD_NAME') {
+                try {
+                    $result = cloudinary()->uploadApi()->upload($request->file('photo')->getRealPath(), ['folder' => 'photos', 'resource_type' => 'auto']);
+                    $validatedData['photo'] = $result['secure_url'];
+                } catch (\Exception $e) {
+                    $path = $request->file('photo')->store('photos', 'public');
+                    $validatedData['photo'] = '/storage/' . $path;
+                }
+            } else {
+                $path = $request->file('photo')->store('photos', 'public');
+                $validatedData['photo'] = '/storage/' . $path;
+            }
         }
 
          $user->update($validatedData);
