@@ -34,7 +34,7 @@ export default function CTA() {
   };
 
   return (
-    <section className="max-w-7xl mx-auto px-6 lg:px-12 mb-32 mt-20 relative" style={{ perspective: '2000px' }}>
+    <section className="max-w-7xl mx-auto px-6 lg:px-12 mb-24 mt-12 relative" style={{ perspective: '2000px' }}>
       <motion.div 
         ref={containerRef}
         style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
