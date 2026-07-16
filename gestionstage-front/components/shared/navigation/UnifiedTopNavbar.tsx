@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { apiFetch, getAvatarUrl } from '@/lib/api';
 import NavbarSearch from './NavbarSearch';
+import PushNotificationManager from '@/components/ui/PushNotificationManager';
 
 interface NotificationData {
   id: string;
@@ -229,6 +230,9 @@ export default function UnifiedTopNavbar({
               <Search className="w-5 h-5" />
             </button>
           </Link>
+
+          {/* Push Notification Manager */}
+          <PushNotificationManager />
 
           {/* Theme Toggle */}
           <motion.button 
