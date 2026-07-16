@@ -20,6 +20,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => CheckRole::class,
             'banned' => CheckBanned::class,
         ]);
+        $middleware->encryptCookies(except: [
+            'userRole',
+            'userName',
+            'token',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
