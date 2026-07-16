@@ -33,8 +33,8 @@ interface Offer {
   };
 }
 
-export default function OfferDetailContent({ offerId }: { offerId: string }) {
-  const [offer, setOffer] = useState<Offer | null>(null);
+export default function OfferDetailContent({ offerId, initialData }: { offerId: string; initialData?: any }) {
+  const [offer, setOffer] = useState<Offer | null>(initialData || null);
   const [cvs, setCvs] = useState<CV[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
