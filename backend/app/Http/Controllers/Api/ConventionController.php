@@ -142,12 +142,26 @@ class ConventionController extends Controller
             $data['pdf_url'] = Storage::disk('public')->url($candidature->convention_pdf_path);
         }
 
-        if ($isStudent && $candidature->yousign_signature_link_etudiant) {
-            $data['signature_link'] = $candidature->yousign_signature_link_etudiant;
+        if ($isStudent) {
+            $link = $candidature->yousign_signature_link_etudiant;
+            if (!$link && $candidature->convention_statut === 'en_signature' && $candidature->yousign_procedure_id) {
+                $link = $this->conventionService->fetchSignerLink($candidature->yousign_procedure_id, 0);
+                if ($link) {
+                    $candidature->update(['yousign_signature_link_etudiant' => $link]);
+                }
+            }
+            if ($link) $data['signature_link'] = $link;
         }
 
-        if ($isEntreprise && $candidature->yousign_signature_link_entreprise) {
-            $data['signature_link'] = $candidature->yousign_signature_link_entreprise;
+        if ($isEntreprise) {
+            $link = $candidature->yousign_signature_link_entreprise;
+            if (!$link && $candidature->convention_statut === 'en_signature' && $candidature->yousign_procedure_id) {
+                $link = $this->conventionService->fetchSignerLink($candidature->yousign_procedure_id, 1);
+                if ($link) {
+                    $candidature->update(['yousign_signature_link_entreprise' => $link]);
+                }
+            }
+            if ($link) $data['signature_link'] = $link;
         }
 
         return response()->json($data);
