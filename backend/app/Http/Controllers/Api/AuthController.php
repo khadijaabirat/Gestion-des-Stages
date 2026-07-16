@@ -32,7 +32,11 @@ class AuthController extends Controller
             'description' => $validatedData['description'] ?? null,
             'site_web' => $validatedData['site_web'] ?? null, 
             'est_valide' => $validatedData['role'] === 'entreprise' ? false : true, 
-            'document_juridique' => $request->hasFile('document_juridique') ? $request->file('document_juridique')->store('documents', 'public') : null,
+            'document_juridique' => $request->hasFile('document_juridique') 
+                ? ((env('CLOUDINARY_URL') && env('CLOUDINARY_URL') !== 'cloudinary://API_KEY:API_SECRET@CLOUD_NAME') 
+                    ? cloudinary()->uploadApi()->upload($request->file('document_juridique')->getRealPath(), ['folder' => 'documents', 'resource_type' => 'auto'])['secure_url'] 
+                    : $request->file('document_juridique')->store('documents', 'public')) 
+                : null,
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;
