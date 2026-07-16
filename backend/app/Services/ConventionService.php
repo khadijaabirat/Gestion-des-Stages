@@ -167,4 +167,35 @@ class ConventionService
             'link_entreprise' => $linkEntreprise,
         ];
     }
+
+    /**
+     * Fetch a signer's signature_link live from Yousign API.
+     * $signerIndex: 0 = etudiant, 1 = entreprise
+     */
+    public function fetchSignerLink(string $procedureId, int $signerIndex): ?string
+    {
+        $signersRes = Http::withToken($this->yousignApiKey)
+            ->get("{$this->yousignBaseUrl}/signature_requests/{$procedureId}/signers");
+
+        if ($signersRes->failed()) {
+            Log::error('Yousign fetchSignerLink: failed to list signers', $signersRes->json() ?? []);
+            return null;
+        }
+
+        $signers = $signersRes->json('signers') ?? $signersRes->json() ?? [];
+        // Handle both {signers: [...]} and [...] response shapes
+        if (isset($signers[0]) && is_array($signers[0])) {
+            $signer = $signers[$signerIndex] ?? null;
+        } else {
+            $signer = array_values($signers)[$signerIndex] ?? null;
+        }
+
+        if (!$signer || empty($signer['id'])) return null;
+
+        $res = Http::withToken($this->yousignApiKey)
+            ->get("{$this->yousignBaseUrl}/signature_requests/{$procedureId}/signers/{$signer['id']}");
+
+        Log::info("Yousign fetchSignerLink[{$signerIndex}]", $res->json() ?? []);
+        return $res->json('signature_link');
+    }
 }
