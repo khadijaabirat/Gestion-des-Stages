@@ -5,6 +5,7 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import BackgroundEffects from '@/components/ui/BackgroundEffects';
 import ThemeProvider from '@/components/providers/ThemeProvider';
+import PWAInstallPrompt from '@/components/ui/PWAInstallPrompt';
 import { Toaster } from 'react-hot-toast';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
@@ -13,7 +14,17 @@ const jetbrains = JetBrains_Mono({ subsets: ['latin'], variable: '--font-jetbrai
 
 export const metadata: Metadata = {
   title: 'NexusIntern | Plateforme mondiale de stages 2026',
-  description: 'Accélérez votre ascension professionnelle avec notre plateforme de stages pilotée par l\'IA',
+  description: 'Accélérez votre ascension professionnelle avec notre plateforme de stages de nouvelle génération',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'NexusIntern',
+  },
+};
+
+export const viewport = {
+  themeColor: '#5644d0',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -46,6 +57,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               },
             }}
           />
+          <PWAInstallPrompt />
           {children}
           <Footer />
         </ThemeProvider>
