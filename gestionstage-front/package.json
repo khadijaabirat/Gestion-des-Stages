@@ -14,12 +14,15 @@
     "@react-three/fiber": "^8.17.10",
     "@tanstack/react-query": "^5.101.2",
     "@tanstack/react-query-devtools": "^5.101.2",
+    "@types/leaflet": "^1.9.21",
     "axios": "^1.18.1",
     "cobe": "^2.0.1",
     "framer-motion": "^12.40.0",
     "laravel-echo": "^2.3.7",
+    "leaflet": "^1.9.4",
     "lucide-react": "^1.17.0",
     "next": "^14.2.0",
+    "next-pwa": "^5.6.0",
     "next-themes": "^0.4.6",
     "pusher-js": "^8.5.0",
     "react": "^18.3.0",
@@ -27,6 +30,7 @@
     "react-hook-form": "^7.80.0",
     "react-hot-toast": "^2.6.0",
     "react-is": "^19.2.7",
+    "react-leaflet": "^4.2.1",
     "recharts": "^3.9.0",
     "three": "^0.185.0",
     "zod": "^4.4.3"
@@ -37,6 +41,7 @@
     "@types/react-dom": "^18",
     "autoprefixer": "^10.4.0",
     "postcss": "^8.4.0",
+    "sharp": "^0.35.3",
     "tailwindcss": "^3.4.0",
     "typescript": "^5"
   }
