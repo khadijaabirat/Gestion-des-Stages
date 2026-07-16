@@ -35,6 +35,8 @@ return $this->user() && ($offre->user_id === $this->user()->id || $this->user()-
             'date_expiration' => 'sometimes|required_with:date_debut|date|after:date_debut',
             'duree' => 'sometimes|required|integer|min:1|max:12',
             'localisation' => 'sometimes|required|string|max:255',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
             'statut' => 'sometimes|required|in:draft,published,closed,expired'
              ];
     }
