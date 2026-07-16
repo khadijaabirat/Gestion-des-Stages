@@ -38,7 +38,12 @@ class OffreStageController extends Controller
             $query->where('duree', $request->duree);
         }
 
-        $offres = $query->orderBy('created_at', 'desc')->paginate(10);
+        $perPage = $request->input('per_page', 10);
+        if ($perPage === 'all') {
+            $offres = $query->orderBy('created_at', 'desc')->get();
+        } else {
+            $offres = $query->orderBy('created_at', 'desc')->paginate((int) $perPage);
+        }
 
         return OffreStageResource::collection($offres)->additional([
             'message' => 'Liste des offres de stage'
