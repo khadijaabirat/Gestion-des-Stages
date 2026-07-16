@@ -223,7 +223,7 @@ export default function CVManagerContent() {
               <Upload className="w-8 h-8 text-primary" />
             </motion.div>
             <p className="font-bold text-on-surface mb-1">{selectedFile ? selectedFile.name : 'Glissez votre CV ici'}</p>
-            <p className="text-sm text-on-surface-variant">PDF uniquement · Maximum 2MB</p>
+            <p className="text-sm text-on-surface-variant">PDF uniquement · Maximum 10MB</p>
             <input type="file" ref={fileInputRef} className="hidden" accept=".pdf" onChange={e => { const f = e.target.files?.[0]; if (f) handleFileSelect(f); }} />
           </div>
 
