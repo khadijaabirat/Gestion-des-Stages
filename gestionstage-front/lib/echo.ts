@@ -7,7 +7,7 @@ if (typeof window !== 'undefined') {
   (window as any).Pusher = Pusher;
 }
 
-let echoInstance: Echo | null = null;
+let echoInstance: Echo<any> | null = null;
 
 export const getEcho = () => {
   if (typeof window === 'undefined') return null;
@@ -23,7 +23,7 @@ export const getEcho = () => {
     enabledTransports: ['ws', 'wss'],
     authorizer: (channel: any, options: any) => {
       return {
-        authorize: (socketId: string, callback: (err: boolean, data: any) => void) => {
+        authorize: (socketId: string, callback: (err: any, data: any) => void) => {
           apiFetch('/broadcasting/auth', {
             method: 'POST',
             body: JSON.stringify({
