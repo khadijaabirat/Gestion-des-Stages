@@ -40,8 +40,8 @@ export default async function OffersPage({
 
   // On extrait les offres et la pagination comme le faisait apiFetch
   // Laravel renvoie souvent la pagination sous la clé "data" ou directement
-  const rawOffers = initialData?.data?.data || initialData?.data || initialData || [];
-  const paginationData = initialData?.data || initialData;
+  const rawOffers = initialData?.data || [];
+  const paginationData = initialData?.meta || initialData?.data || initialData;
 
   // On passe ces données pré-fetchées au Client Component (Leaf Component)
   return (
@@ -49,8 +49,9 @@ export default async function OffersPage({
       initialOffers={Array.isArray(rawOffers) ? rawOffers : []} 
       initialPagination={{
         total: paginationData?.total || rawOffers.length || 0,
-        next_page_url: paginationData?.next_page_url || null,
-        current_page: paginationData?.current_page || 1
+        next_page_url: initialData?.links?.next || paginationData?.next_page_url || null,
+        current_page: paginationData?.current_page || 1,
+        last_page: paginationData?.last_page || Math.ceil((paginationData?.total || rawOffers.length || 0) / 10) || 1
       }}
     />
   );
