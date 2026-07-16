@@ -31,6 +31,8 @@ export default function AdminSkillsContent() {
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<SkillCategory | 'Toutes'>('Toutes');
   const [isLoading, setIsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
 
   // Modals State
   const [showAddModal, setShowAddModal] = useState(false);
@@ -78,6 +80,10 @@ export default function AdminSkillsContent() {
     };
   }, [mouseX, mouseY]);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, categoryFilter]);
+
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
     setToast({ show: true, message, type });
     setTimeout(() => setToast({ show: false, message: '', type: 'success' }), 3000);
@@ -92,6 +98,9 @@ export default function AdminSkillsContent() {
       return matchesSearch && matchesCategory;
     });
   }, [skills, searchQuery, categoryFilter]);
+
+  const totalPages = Math.ceil(filteredSkills.length / itemsPerPage);
+  const paginatedSkills = filteredSkills.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const fetchSkills = async () => {
     setIsLoading(true);
@@ -277,6 +286,55 @@ export default function AdminSkillsContent() {
     }
   };
 
+  const renderPagination = () => {
+    if (totalPages <= 1) return null;
+    
+    const pages = [];
+    let startPage = Math.max(1, currentPage - 2);
+    let endPage = Math.min(totalPages, currentPage + 2);
+    
+    if (endPage - startPage < 4) {
+      if (startPage === 1) endPage = Math.min(totalPages, 5);
+      else startPage = Math.max(1, totalPages - 4);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(
+        <button
+          key={i}
+          onClick={() => { setCurrentPage(i); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+          className={`w-10 h-10 rounded-xl font-bold transition-all shadow-sm ${currentPage === i ? 'bg-primary text-white shadow-primary/20 shadow-md scale-105' : 'bg-surface-container text-on-surface hover:bg-surface-variant'}`}
+        >
+          {i}
+        </button>
+      );
+    }
+
+    return (
+      <div className="flex justify-center items-center mt-10 gap-2 w-full col-span-full">
+        <button 
+          onClick={() => { setCurrentPage(prev => Math.max(1, prev - 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }} 
+          disabled={currentPage === 1}
+          className="px-4 py-2.5 bg-surface-container text-on-surface font-semibold rounded-xl disabled:opacity-40 hover:bg-surface-variant transition-colors shadow-sm"
+        >
+          Précédent
+        </button>
+        <div className="flex items-center gap-1.5 mx-2 hidden sm:flex">
+          {startPage > 1 && <span className="text-on-surface-variant font-bold">...</span>}
+          {pages}
+          {endPage < totalPages && <span className="text-on-surface-variant font-bold">...</span>}
+        </div>
+        <button 
+          onClick={() => { setCurrentPage(prev => Math.min(totalPages, prev + 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }} 
+          disabled={currentPage === totalPages}
+          className="px-4 py-2.5 bg-surface-container text-on-surface font-semibold rounded-xl disabled:opacity-40 hover:bg-surface-variant transition-colors shadow-sm"
+        >
+          Suivant
+        </button>
+      </div>
+    );
+  };
+
   // UI Helpers
   const getCategoryColor = (category: SkillCategory) => {
     switch (category) {
@@ -417,7 +475,7 @@ export default function AdminSkillsContent() {
                   </p>
                 </motion.div>
               ) : (
-                filteredSkills.map((skill, i) => (
+                paginatedSkills.map((skill, i) => (
                   <motion.div
                     key={skill.id}
                     layout
@@ -487,6 +545,7 @@ export default function AdminSkillsContent() {
                 ))
               )}
             </AnimatePresence>
+            {renderPagination()}
           </div>
       </main>
 
