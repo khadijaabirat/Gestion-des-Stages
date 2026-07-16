@@ -14,6 +14,8 @@ export interface Offer {
   date_expiration: string;
   created_at: string;
   candidatures_count?: number;
+  latitude?: string | number | null;
+  longitude?: string | number | null;
 }
 
 export const useEntrepriseOffers = () => {
