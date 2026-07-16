@@ -8,10 +8,14 @@ import { ArrowRight, Zap, Building2, MapPin, Clock } from 'lucide-react';
 const FALLBACK_BGS = [
   "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=800",
   "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=800",
-  "https://images.unsplash.com/photo-1556761175-5973dc0f32b7?auto=format&fit=crop&q=80&w=800",
+  "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=800",
   "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&q=80&w=800",
   "https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&q=80&w=800",
-  "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&q=80&w=800"
+  "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&q=80&w=800",
+  "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&q=80&w=800",
+  "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&q=80&w=800",
+  "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&q=80&w=800",
+  "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80&w=800"
 ];
 
 const COLORS = ['FF7E5F', '5644D0', '00C9FF', '92FE9D', 'F5576C', '4FACFE'];
@@ -27,11 +31,11 @@ export default function FeaturedOpportunities({ offres: dynamicOffres }: { offre
 
   const itemVariants = {
     hidden: { opacity: 0, y: 30 },
-    visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100, damping: 20 } }
+    visible: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 100, damping: 20 } }
   };
 
   return (
-    <section className="max-w-7xl mx-auto px-6 lg:px-12 mb-32 relative">
+    <section className="max-w-7xl mx-auto px-6 lg:px-12 mb-16 relative">
       <motion.div
         initial="hidden"
         whileInView="visible"
@@ -45,7 +49,7 @@ export default function FeaturedOpportunities({ offres: dynamicOffres }: { offre
             <span className="text-xs font-bold tracking-wider text-primary uppercase">Flux en Direct</span>
           </div>
           <h2 className="font-heading text-4xl md:text-5xl text-on-background mb-3 font-black tracking-tight">Opportunités <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Exclusives</span></h2>
-          <p className="text-lg text-on-surface-variant max-w-xl">Accédez en temps réel aux offres prestigieuses des leaders de l'industrie mondiale.</p>
+          <p className="text-lg text-on-surface-variant max-w-xl">Découvrez les meilleures offres de stage du moment et postulez en un clic.</p>
         </motion.div>
         
         <Link href="/offres">
@@ -125,31 +129,40 @@ export default function FeaturedOpportunities({ offres: dynamicOffres }: { offre
               <motion.div
                 key={offre.id}
                 variants={itemVariants}
-                className={`${colSpan} glass-panel rounded-[2rem] p-6 flex flex-col justify-between cursor-pointer min-h-[360px] group relative overflow-hidden transition-all duration-500 hover:border-primary/50 hover:shadow-[0_20px_40px_rgba(var(--primary-rgb),0.1)] bg-surface-container-lowest`}
+                className={`${colSpan} glass-panel rounded-[2rem] p-0 flex flex-col justify-between cursor-pointer min-h-[360px] group relative overflow-hidden transition-all duration-500 hover:border-primary/50 hover:shadow-[0_20px_40px_rgba(var(--primary-rgb),0.1)] bg-surface-container-lowest`}
                 whileHover={{ scale: 1.02, y: -5 }}
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-
-                <Link href={`/offres/${offre.id}`} className="flex flex-col h-full justify-between relative z-10">
-                  <div className="flex justify-between items-start mb-6">
-                    <div className="w-16 h-16 rounded-2xl border border-outline-variant/30 flex items-center justify-center overflow-hidden bg-white shadow-sm group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500">
-                      <img src={logoUrl} alt={offre.entreprise} className="w-full h-full object-cover" />
-                    </div>
+                <Link href={`/offres/${offre.id}`} className="flex flex-col h-full relative z-10 w-full">
+                  {/* Top Image Half */}
+                  <div className="relative w-full h-40 overflow-hidden">
+                    <Image
+                      src={fallbackBg}
+                      alt={offre.entreprise || 'Entreprise'}
+                      fill
+                      className="object-cover group-hover:scale-110 transition-transform duration-700"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/40 to-transparent" />
                     
-                    <div className="flex flex-col gap-2 items-end">
+                    <div className="absolute top-4 right-4 flex gap-2">
                       {offre.tags?.slice(0, 2).map((tag: string, i: number) => (
-                        <span key={i} className="text-[10px] font-mono font-bold px-2 py-1 rounded bg-secondary/10 text-secondary border border-secondary/20 shadow-sm">
+                        <span key={i} className="text-[10px] font-mono font-bold px-2.5 py-1 rounded-full bg-black/40 backdrop-blur-md text-white border border-white/20 shadow-sm">
                           {tag}
                         </span>
                       ))}
                     </div>
+
+                    {/* Logo hovering over the edge */}
+                    <div className="absolute -bottom-5 left-6 w-14 h-14 rounded-xl border-4 border-background flex items-center justify-center overflow-hidden bg-white shadow-xl z-20 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500">
+                      <img src={logoUrl} alt={offre.entreprise} className="w-full h-full object-cover" />
+                    </div>
                   </div>
 
-                  <div className="flex-grow flex flex-col justify-end">
-                    <h3 className="font-heading text-xl font-bold text-on-background mb-4 leading-tight group-hover:text-primary transition-colors duration-300">
+                  {/* Content Half */}
+                  <div className="p-6 pt-8 flex-grow flex flex-col justify-between relative z-10">
+                    <h3 className="font-heading text-xl font-bold text-on-background mb-4 leading-tight group-hover:text-primary transition-colors duration-300 line-clamp-2">
                       {offre.titre}
                     </h3>
-                    <div className="space-y-2.5 text-sm text-on-surface-variant font-medium">
+                    <div className="space-y-2.5 text-sm text-on-surface-variant font-medium mt-auto">
                       <p className="flex items-center gap-2"><Building2 className="w-4 h-4 text-primary/60" /> {offre.entreprise}</p>
                       <p className="flex items-center gap-2"><MapPin className="w-4 h-4 text-primary/60" /> {offre.localisation || 'À distance'}</p>
                       <p className="flex items-center gap-2"><Clock className="w-4 h-4 text-primary/60" /> {offre.duree || 'Non spécifiée'}</p>
