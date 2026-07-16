@@ -14,12 +14,17 @@ use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\ConventionController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\SocialAuthController;
 
 // Yousign webhook (no auth — called by Yousign servers)
 Route::post('/conventions/webhook/yousign', [ConventionController::class, 'webhook']);
 
+// Authentication
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login');
+
+
+
 // Public routes for offers (both paths for compatibility)
 Route::get('/offres', [OffreStageController::class, 'index']);
 Route::get('/offres/{id}', [OffreStageController::class, 'show']);
@@ -62,6 +67,10 @@ Route::get('/home/data', [\App\Http\Controllers\Api\PublicController::class, 'ho
     Route::patch('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
     Route::delete('/notifications/{id}', [NotificationController::class, 'destroy']);
    
+    // Push Notifications
+    Route::post('/push/subscribe', [\App\Http\Controllers\Api\PushSubscriptionController::class, 'store']);
+    Route::post('/push/unsubscribe', [\App\Http\Controllers\Api\PushSubscriptionController::class, 'destroy']);
+
     // Users Search and Public Profiles
     Route::get('/users/search', [UserController::class, 'search']);
     Route::get('/users/{id}', [UserController::class, 'showPublicProfile']);
