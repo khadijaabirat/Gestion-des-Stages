@@ -21,6 +21,8 @@ class OffreStage extends Model
         'duree',
         'statut',
         'localisation',
+        'latitude',
+        'longitude',
     ];
 
     protected $casts = [
