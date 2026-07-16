@@ -18,7 +18,7 @@ export default function ProcessRoadmap() {
     },
     {
       title: "Mise en valeur",
-      description: "Ajouter ses Skills (compétences) et ses Expériences avec l'assistance IA.",
+      description: "Ajoutez vos compétences et vos expériences pour vous démarquer.",
       icon: <Star className="w-10 h-10" />,
       color: "from-tertiary/20 to-tertiary-container/20",
       glowColor: "bg-tertiary",
@@ -26,7 +26,7 @@ export default function ProcessRoadmap() {
     },
     {
       title: "Action",
-      description: "Trouver l'offre idéale et postuler(). Match parfait garanti.",
+      description: "Trouvez l'offre idéale et postulez directement en un clic.",
       icon: <Search className="w-10 h-10" />,
       color: "from-secondary/20 to-secondary-container/20",
       glowColor: "bg-secondary",
@@ -37,7 +37,7 @@ export default function ProcessRoadmap() {
   const companySteps = [
     {
       title: "Inscription & Validation",
-      description: "Créer le compte avec description et site web (validation Admin rapide).",
+      description: "Créez votre compte entreprise et présentez votre activité en quelques minutes.",
       icon: <Building2 className="w-10 h-10" />,
       color: "from-secondary/20 to-secondary-container/20",
       glowColor: "bg-secondary",
@@ -45,7 +45,7 @@ export default function ProcessRoadmap() {
     },
     {
       title: "Publication",
-      description: "Rédiger et publierOffre() pour attirer les meilleurs talents.",
+      description: "Publiez vos offres de stage pour attirer les meilleurs étudiants.",
       icon: <PenTool className="w-10 h-10" />,
       color: "from-tertiary/20 to-tertiary-container/20",
       glowColor: "bg-tertiary",
@@ -53,7 +53,7 @@ export default function ProcessRoadmap() {
     },
     {
       title: "Recrutement",
-      description: "Gérer candidatures et utiliser la messagerie intégrée pour contacter.",
+      description: "Gérez les candidatures, discutez en direct, et signez vos conventions en ligne.",
       icon: <MessageSquare className="w-10 h-10" />,
       color: "from-primary/20 to-primary-container/20",
       glowColor: "bg-primary",
@@ -64,7 +64,7 @@ export default function ProcessRoadmap() {
   const currentSteps = activeTab === 'etudiant' ? studentSteps : companySteps;
 
   return (
-    <section className="max-w-7xl mx-auto px-6 lg:px-12 mb-32 py-16 relative overflow-hidden">
+    <section className="max-w-7xl mx-auto px-6 lg:px-12 mb-16 py-8 relative overflow-hidden">
       {/* Ambient glowing background blobs */}
       <div className="absolute top-1/2 left-1/4 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
       <div className="absolute top-1/2 right-1/4 w-[500px] h-[500px] bg-secondary/10 rounded-full blur-[120px] translate-x-1/2 -translate-y-1/2 pointer-events-none" />
