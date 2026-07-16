@@ -1,6 +1,13 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { Offer } from '@/hooks/useEntrepriseOffers';
 
+import dynamic from 'next/dynamic';
+
+const LocationPickerMap = dynamic(() => import('./LocationPickerMap'), {
+  ssr: false,
+  loading: () => <div className="h-[250px] w-full bg-surface-variant/30 rounded-xl animate-pulse flex items-center justify-center">Chargement de la carte...</div>
+});
+
 interface OfferModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -38,12 +45,12 @@ export const OfferModal = ({
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
             className={`bg-surface rounded-3xl w-full max-w-2xl relative z-10 shadow-[0_20px_60px_rgba(0,0,0,0.3)] border border-white/20 overflow-hidden flex flex-col max-h-[90vh] perspective-1000 ${isProcessing ? 'pointer-events-none opacity-80' : ''}`}
           >
-            <div className="p-6 border-b border-outline-variant/20 bg-surface-container-lowest flex justify-between items-center">
+            <div className="p-6 border-b border-outline-variant/20 bg-surface-container-lowest flex justify-between items-center shrink-0">
               <h3 className="text-2xl font-bold font-heading text-on-surface flex items-center gap-2">
                 <span className="material-symbols-outlined text-primary">{editingOffer ? 'edit_document' : 'add_circle'}</span>
                 {editingOffer ? 'Modifier l\'offre' : 'Nouvelle offre de stage'}
               </h3>
-              <button aria-label="Fermer la fenêtre" onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container text-on-surface-variant transition-colors">
+              <button type="button" aria-label="Fermer la fenêtre" onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container text-on-surface-variant transition-colors">
                 <span className="material-symbols-outlined">close</span>
               </button>
             </div>
@@ -62,13 +69,25 @@ export const OfferModal = ({
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div>
-                    <label className="block text-sm font-bold text-on-surface mb-1.5">Localisation</label>
+                    <label className="block text-sm font-bold text-on-surface mb-1.5">Ville / Région</label>
                     <input value={formData.localisation} onChange={e => setFormData({...formData, localisation: e.target.value})} type="text" className="w-full bg-surface-container-lowest border border-outline-variant/50 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" placeholder="Ex: Casablanca / Télétravail" />
                   </div>
                   <div>
                     <label className="block text-sm font-bold text-on-surface mb-1.5">Durée</label>
                     <input value={formData.duree} onChange={e => setFormData({...formData, duree: e.target.value})} type="text" className="w-full bg-surface-container-lowest border border-outline-variant/50 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" placeholder="Ex: 6 mois" />
                   </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-on-surface mb-1.5 flex justify-between">
+                    <span>Localisation précise sur la carte (Optionnel)</span>
+                    <span className="text-xs font-normal text-on-surface-variant">Aide les étudiants à trouver le lieu exact</span>
+                  </label>
+                  <LocationPickerMap 
+                    initialLat={formData.latitude} 
+                    initialLng={formData.longitude} 
+                    onChange={(lat, lng) => setFormData({...formData, latitude: lat, longitude: lng})} 
+                  />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
