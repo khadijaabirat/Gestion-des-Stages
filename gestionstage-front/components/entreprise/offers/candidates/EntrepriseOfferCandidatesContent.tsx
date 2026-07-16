@@ -29,10 +29,6 @@ interface Candidate {
   conventionStatus?: 'non_generee' | 'generee' | 'en_signature' | 'signee';
   signatureLinkEntreprise?: string;
   conventionPdfPath?: string;
-  filiere?: string;
-  niveauEtude?: string;
-  bio?: string;
-  motivation?: string;
 }
 
 interface EntrepriseOfferCandidatesContentProps {
