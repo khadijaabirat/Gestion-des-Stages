@@ -42,7 +42,7 @@ class CvController extends Controller
 
          $request->validate([
             'title' => 'required|string|max:255',
-            'file' => 'required|file|mimes:pdf|max:2048',  
+            'file' => 'required|file|mimes:pdf|max:10240',  
         ]);
          $cvCount = Cv::where('user_id', $user->id)->count();
         if ($cvCount >= 5) {
@@ -50,7 +50,16 @@ class CvController extends Controller
         }
 
          if ($request->hasFile('file')) {
-            $path = $request->file('file')->store('cvs', 'public');
+             if (env('CLOUDINARY_URL') && env('CLOUDINARY_URL') !== 'cloudinary://API_KEY:API_SECRET@CLOUD_NAME') {
+                 try {
+                     $result = cloudinary()->uploadApi()->upload($request->file('file')->getRealPath(), ['folder' => 'cvs', 'resource_type' => 'auto']);
+                     $path = $result['secure_url'];
+                 } catch (\Exception $e) {
+                     $path = $request->file('file')->store('cvs', 'public');
+                 }
+             } else {
+                 $path = $request->file('file')->store('cvs', 'public');
+             }
             
              $isMain = $cvCount === 0 ? true : false;
 
@@ -87,7 +96,7 @@ class CvController extends Controller
 
         return response()->json([
             'data' => $cv,
-            'file_url' => asset('storage/' . $cv->file_path) 
+            'file_url' => str_starts_with($cv->file_path, 'http') ? $cv->file_path : asset('storage/' . $cv->file_path) 
         ], 200);
     }
 
@@ -162,7 +171,9 @@ $cv = Cv::withCount('candidatures')
         if ($cv->is_main && $totalCvs > 1) {
             return response()->json(['message' => 'Vous ne pouvez pas supprimer votre CV principal. Choisissez-en un autre d\'abord.'], 400);
         }
-         if (Storage::disk('public')->exists($cv->file_path)) {
+         if (str_starts_with($cv->file_path, 'http')) {
+             // Let Cloudinary keep it or use cloudinary API to delete
+         } elseif (Storage::disk('public')->exists($cv->file_path)) {
             Storage::disk('public')->delete($cv->file_path);
         }
 
