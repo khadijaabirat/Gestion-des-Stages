@@ -2,17 +2,17 @@
 
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { GraduationCap, Building2, BrainCircuit } from 'lucide-react';
+import { GraduationCap, Building2, Network } from 'lucide-react';
 
 export default function GlobalEcosystem() {
   const nodes = [
     { icon: <GraduationCap className="w-5 h-5 md:w-6 md:h-6" />, label: 'Talents', sub: 'La nouvelle génération', pos: 'top-[15%] left-[5%] md:left-[15%]', color: 'from-blue-500/20 to-indigo-600/20', textColor: 'text-blue-500' },
     { icon: <Building2 className="w-5 h-5 md:w-6 md:h-6" />, label: 'Entreprises', sub: 'Leaders mondiaux', pos: 'bottom-[15%] right-[5%] md:right-[15%]', color: 'from-purple-500/20 to-fuchsia-600/20', textColor: 'text-purple-500' },
-    { icon: <BrainCircuit className="w-5 h-5 md:w-6 md:h-6" />, label: 'NexusBrain™', sub: 'Intelligence Artificielle', pos: 'top-[10%] right-[10%] md:right-[20%]', color: 'from-primary/20 to-tertiary/20', textColor: 'text-primary' }
+    { icon: <Network className="w-5 h-5 md:w-6 md:h-6" />, label: 'NexusIntern', sub: 'Système Avancé', pos: 'top-[10%] right-[10%] md:right-[20%]', color: 'from-primary/20 to-tertiary/20', textColor: 'text-primary' }
   ];
 
   return (
-    <section className="max-w-7xl mx-auto px-6 lg:px-12 mb-32 relative">
+    <section className="max-w-7xl mx-auto px-6 lg:px-12 mb-16 relative">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-secondary/10 blur-[100px] rounded-full pointer-events-none -z-10" />
 
       <div className="text-center mb-16 relative z-10">
@@ -44,7 +44,7 @@ export default function GlobalEcosystem() {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="text-lg md:text-xl text-on-surface-variant max-w-2xl mx-auto font-medium"
         >
-          Rejoignez le réseau d'élite mondial où les talents exceptionnels rencontrent les entreprises les plus innovantes.
+          Rejoignez une communauté où les meilleurs étudiants rencontrent directement les entreprises qui recrutent.
         </motion.p>
       </div>
 
