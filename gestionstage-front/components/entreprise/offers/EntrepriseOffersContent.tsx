@@ -48,7 +48,9 @@ export default function EntrepriseOffersContent() {
     duree: '',
     date_debut: '',
     date_expiration: '',
-    statut: 'published'
+    statut: 'published',
+    latitude: null as number | null,
+    longitude: null as number | null
   });
 
   useEffect(() => {
@@ -83,7 +85,9 @@ export default function EntrepriseOffersContent() {
       duree: '',
       date_debut: '',
       date_expiration: '',
-      statut: 'published'
+      statut: 'published',
+      latitude: null,
+      longitude: null
     });
     setIsOfferModalOpen(true);
   };
@@ -97,7 +101,9 @@ export default function EntrepriseOffersContent() {
       duree: offer.duree || '',
       date_debut: offer.date_debut ? offer.date_debut.substring(0, 10) : '',
       date_expiration: offer.date_expiration ? offer.date_expiration.substring(0, 10) : '',
-      statut: offer.statut
+      statut: offer.statut,
+      latitude: offer.latitude ? Number(offer.latitude) : null,
+      longitude: offer.longitude ? Number(offer.longitude) : null
     });
     setIsOfferModalOpen(true);
   };
@@ -109,7 +115,7 @@ export default function EntrepriseOffersContent() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsProcessing(true);
-    const success = await saveOffer(formData, editingOffer?.id);
+    const success = await saveOffer(formData as Omit<Offer, "id" | "created_at">, editingOffer?.id);
     if (success) {
       setIsOfferModalOpen(false);
     }
@@ -238,21 +244,21 @@ export default function EntrepriseOffersContent() {
       />
 
       <AnimatePresence>
-        {toast.show && (
+        {uiToast.show && (
           <motion.div
             initial={{ opacity: 0, y: 50, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className={`fixed bottom-24 md:bottom-8 left-1/2 -translate-x-1/2 z-[100] px-6 py-4 rounded-2xl shadow-xl border flex items-center gap-3 backdrop-blur-xl ${
-              toast.type === 'error' 
+            className={`fixed bottom-8 left-1/2 -translate-x-1/2 z-[150] px-6 py-4 rounded-2xl shadow-xl border flex items-center gap-3 backdrop-blur-xl ${
+              uiToast.type === 'error' 
                 ? 'bg-error-container/90 border-error/20 text-on-error-container' 
                 : 'bg-green-50/90 border-green-200 text-green-800'
             }`}
           >
             <span className="material-symbols-outlined">
-              {toast.type === 'error' ? 'error' : 'check_circle'}
+              {uiToast.type === 'error' ? 'error' : 'check_circle'}
             </span>
-            <p className="font-bold">{toast.message}</p>
+            <p className="font-bold">{uiToast.message}</p>
           </motion.div>
         )}
       </AnimatePresence>
