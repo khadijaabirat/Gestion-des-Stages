@@ -66,6 +66,8 @@ export default function ApplicationsContent() {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'all' | 'en_attente' | 'accepte' | 'refuse' | 'annule'>('all');
   const [cancellingId, setCancellingId] = useState<number | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
   const fetchCandidatures = useCallback(async () => {
     try {
@@ -141,6 +143,11 @@ export default function ApplicationsContent() {
     }
   };
 
+  const handleTabChange = (key: 'all' | 'en_attente' | 'accepte' | 'refuse' | 'annule') => {
+    setActiveTab(key);
+    setCurrentPage(1);
+  };
+
   const TABS = [
     { key: 'all', label: 'Toutes', count: candidatures.length },
     { key: 'en_attente', label: 'En attente', count: candidatures.filter(c => c.statut === 'en_attente').length },
@@ -150,12 +157,63 @@ export default function ApplicationsContent() {
   ] as const;
 
   const filtered = activeTab === 'all' ? candidatures : candidatures.filter(c => c.statut === activeTab);
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
+  const paginatedFiltered = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const stats = {
     total: candidatures.length,
     accepte: candidatures.filter(c => c.statut === 'accepte').length,
     en_attente: candidatures.filter(c => c.statut === 'en_attente').length,
     refuse: candidatures.filter(c => c.statut === 'refuse').length,
+  };
+
+  const renderPagination = () => {
+    if (totalPages <= 1) return null;
+    
+    const pages = [];
+    let startPage = Math.max(1, currentPage - 2);
+    let endPage = Math.min(totalPages, currentPage + 2);
+    
+    if (endPage - startPage < 4) {
+      if (startPage === 1) endPage = Math.min(totalPages, 5);
+      else startPage = Math.max(1, totalPages - 4);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(
+        <button
+          key={i}
+          onClick={() => { setCurrentPage(i); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+          className={`w-10 h-10 rounded-xl font-bold transition-all shadow-sm ${currentPage === i ? 'bg-primary text-white shadow-primary/20 shadow-md scale-105' : 'bg-surface-container text-on-surface hover:bg-surface-variant'}`}
+        >
+          {i}
+        </button>
+      );
+    }
+
+    return (
+      <div className="flex justify-center items-center mt-10 gap-2 pb-8">
+        <button 
+          onClick={() => { setCurrentPage(prev => Math.max(1, prev - 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }} 
+          disabled={currentPage === 1}
+          className="px-4 py-2.5 bg-surface-container text-on-surface font-semibold rounded-xl disabled:opacity-40 hover:bg-surface-variant transition-colors shadow-sm"
+        >
+          Précédent
+        </button>
+        <div className="flex items-center gap-1.5 mx-2 hidden sm:flex">
+          {startPage > 1 && <span className="text-on-surface-variant font-bold">...</span>}
+          {pages}
+          {endPage < totalPages && <span className="text-on-surface-variant font-bold">...</span>}
+        </div>
+        <button 
+          onClick={() => { setCurrentPage(prev => Math.min(totalPages, prev + 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }} 
+          disabled={currentPage === totalPages}
+          className="px-4 py-2.5 bg-surface-container text-on-surface font-semibold rounded-xl disabled:opacity-40 hover:bg-surface-variant transition-colors shadow-sm"
+        >
+          Suivant
+        </button>
+      </div>
+    );
   };
 
   return (
@@ -217,7 +275,7 @@ export default function ApplicationsContent() {
             {TABS.map(tab => (
               <motion.button
                 key={tab.key}
-                onClick={() => setActiveTab(tab.key as any)}
+                onClick={() => handleTabChange(tab.key as any)}
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
                 className={`relative flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm whitespace-nowrap transition-all ${
@@ -287,7 +345,7 @@ export default function ApplicationsContent() {
           ) : (
             <AnimatePresence mode="popLayout">
               <div className="space-y-4">
-                {filtered.map((candidature, index) => (
+                {paginatedFiltered.map((candidature, index) => (
                   <CandidatureCard
                     key={candidature.id}
                     candidature={candidature}
@@ -299,6 +357,7 @@ export default function ApplicationsContent() {
                   />
                 ))}
               </div>
+              {renderPagination()}
             </AnimatePresence>
           )}
         </div>
