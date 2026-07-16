@@ -17,6 +17,7 @@ const PUBLIC_LINKS = [
   { label: 'Accueil', href: '/', icon: <Home className="w-4 h-4" /> },
   { label: 'Découvrir les offres', href: '/offres', icon: <Search className="w-4 h-4" /> },
   { label: 'Pour les Entreprises', href: '/entreprises-info', icon: <Building2 className="w-4 h-4" /> },
+  { label: 'FAQ', href: '/faq', icon: <HelpCircle className="w-4 h-4" /> },
 ];
 
 /* ═══════════ PREMIUM LOGO WITH IMAGE ═══════════ */
