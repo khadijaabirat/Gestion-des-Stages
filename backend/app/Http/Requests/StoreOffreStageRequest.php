@@ -32,6 +32,8 @@ return Auth::check() &&
             'date_expiration' => 'required|date|after:date_debut',
             'duree' => 'required|integer|min:1|max:12', 
             'localisation' => 'required|string|max:255',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
             'statut' => 'nullable|in:draft,published,closed,expired'
         ];
     }
